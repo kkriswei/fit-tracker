@@ -7,6 +7,9 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FIT OS">
 <meta name="theme-color" content="#141c2b">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>FIT·OS — 减脂作战系统</title>
 <style>
 :root{
@@ -712,6 +715,9 @@ setInterval(renderHeader,60000);
 // ===== 实时跳秒时钟 =====
 function clock(){const n=new Date(),dn=['SUN','MON','TUE','WED','THU','FRI','SAT'],p=x=>String(x).padStart(2,'0');const el=document.getElementById('sysdate');if(el)el.textContent=n.getFullYear()+'.'+p(n.getMonth()+1)+'.'+p(n.getDate())+' '+dn[n.getDay()]+' · '+p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());}
 clock();setInterval(clock,1000);
+
+// ===== PWA：注册 Service Worker（离线+可安装）=====
+if('serviceWorker' in navigator){addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));}
 
 // ===== 打字机激励标语 =====
 (function(){const el=document.getElementById('ticker');if(!el)return;
