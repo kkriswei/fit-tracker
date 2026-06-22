@@ -63,6 +63,8 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 .ring{position:relative;width:172px;height:172px;flex-shrink:0}
 .ring svg{transform:rotate(-90deg)}
 .ring .trk{fill:none;stroke:var(--surface2);stroke-width:9}
+.ring .ticks{fill:none;stroke:rgba(34,211,238,.38);stroke-width:2;stroke-dasharray:1.5 9;transform-origin:86px 86px;animation:spin 16s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 .ring .bar{fill:none;stroke:url(#grad);stroke-width:9;stroke-linecap:round;stroke-dasharray:490;stroke-dashoffset:490;transition:stroke-dashoffset 1s cubic-bezier(.4,1.4,.5,1);filter:drop-shadow(0 0 6px var(--glow))}
 .ring-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
 .ring-pct{font-family:var(--mono);font-size:46px;font-weight:700;line-height:1;letter-spacing:-1px}
@@ -225,6 +227,7 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
             <defs><linearGradient id="grad" x1="0" y1="0" x2="1" y2="1">
               <stop offset="0%" stop-color="#3b82f6"/><stop offset="100%" stop-color="#22d3ee"/>
             </linearGradient></defs>
+            <circle class="ticks" cx="86" cy="86" r="69"/>
             <circle class="trk" cx="86" cy="86" r="78"/>
             <circle class="bar" id="ringbar" cx="86" cy="86" r="78"/>
           </svg>
@@ -433,13 +436,14 @@ function toggleDone(chk){
  const was=done.includes(id);
  if(was)done=done.filter(x=>x!==id);else done.push(id);
  setDone(done);row.classList.toggle('done',!was);
- const before=calcStats().tx;updateRing();updateXP();
+ if(!was&&window.__burst){const r=chk.getBoundingClientRect(),c=row.style.getPropertyValue('--cc').trim()||'#22d3ee';window.__burst(r.left+r.width/2,r.top+r.height/2,22,[c,'#ffffff']);}
+ updateRing();updateXP();
  if(!was&&getDone().length===TASKS.length)flashPerfect();
 }
 function updateRing(){
  const done=getDone().length,total=TASKS.length,pct=Math.round(done/total*100);
  const C=490;document.getElementById('ringbar').style.strokeDashoffset=C-C*done/total;
- document.getElementById('ringn').textContent=pct;
+ animNum(document.getElementById('ringn'),pct);
  document.getElementById('ringfrac').textContent=done+' / '+total;
  const led=document.getElementById('led'),st=document.getElementById('status');
  const msgs=['系统就绪 · 开始今日打卡','已启动 · 保持节奏','进度过半 · 状态良好','冲刺阶段 · 就差几步','✓ 全部完成 · 今日满分'];
@@ -462,6 +466,9 @@ function flashPerfect(){
  const f=document.getElementById('lvflash');
  document.getElementById('lv-n').textContent='LV.'+(i+1)+' · '+LEVELS[i].n;
  f.classList.add('show');setTimeout(()=>f.classList.remove('show'),1800);
+ if(window.__burst){window.__burst(innerWidth/2,innerHeight*0.42,70,['#22d3ee','#a855f7','#ec4899','#34d399','#fbbf24','#3b82f6']);
+  setTimeout(()=>window.__burst(innerWidth*0.3,innerHeight*0.35,40),200);
+  setTimeout(()=>window.__burst(innerWidth*0.7,innerHeight*0.35,40),360);}
 }
 function renderPlanToday(){
  const r=PLAN[(doy()-1+PLAN.length)%PLAN.length],idx=(doy()-1+PLAN.length)%PLAN.length;
@@ -480,10 +487,10 @@ function renderData(){
  document.getElementById('d-rank').textContent='LV.'+(i+1)+' · '+LEVELS[i].n;
  document.getElementById('d-next').textContent=nx?('距「'+nx.n+'」还需 '+(need-inL)+' XP'):'已达最高等级 APEX';
  document.getElementById('d-xpbar').style.width=pct+'%';
- document.getElementById('d-streak').textContent=s.ms;
- document.getElementById('d-xp').textContent=s.tx;
- document.getElementById('d-tasks').textContent=s.tt;
- document.getElementById('d-perf').textContent=s.pd;
+ animNum(document.getElementById('d-streak'),s.ms);
+ animNum(document.getElementById('d-xp'),s.tx);
+ animNum(document.getElementById('d-tasks'),s.tt);
+ animNum(document.getElementById('d-perf'),s.pd);
  const h=JSON.parse(localStorage.getItem('history')||'{}'),dn=['日','一','二','三','四','五','六'];let bh='';
  for(let k=6;k>=0;k--){const d=new Date();d.setDate(d.getDate()-k);const v=h[dk(d)],p=v?Math.round(v.done/v.total*100):0,it=k===0;
   bh+='<div class="bcol"><div class="bp" style="color:'+(p>0?'var(--accent)':'var(--dim)')+'">'+(p>0?p+'%':'—')+'</div>'
@@ -509,6 +516,7 @@ function saveTopic(){const v=document.getElementById('topic').value.trim();if(v)
 function resetToday(){if(confirm('重置今日打卡？')){localStorage.removeItem('day_'+dk());syncHistory();renderTasks();updateRing();updateXP();toast('已重置今日');}}
 function clearAll(){if(confirm('清除所有历史数据？无法撤销。')){Object.keys(localStorage).forEach(k=>{if(k.startsWith('day_')||k==='history')localStorage.removeItem(k);});renderTasks();updateRing();updateXP();toast('已清除全部数据');}}
 function toast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+function animNum(el,to){if(!el)return;const from=parseInt(el.textContent)||0;if(from===to){el.textContent=to;return;}const st=performance.now();(function f(t){const k=Math.min(1,(t-st)/650);el.textContent=Math.round(from+(to-from)*(1-Math.pow(1-k,3)));if(k<1)requestAnimationFrame(f);})();}
 
 syncHistory();renderHeader();renderTasks();renderPlanToday();renderTip();updateRing();updateXP();
 setInterval(renderHeader,60000);
@@ -519,7 +527,8 @@ setInterval(renderHeader,60000);
  const ctx=cv.getContext('2d');let w,h,dpr,pts;
  const PAL=['#22d3ee','#a855f7','#ec4899','#38bdf8','#34d399','#fbbf24'];
  const RGB=PAL.map(c=>{const n=parseInt(c.slice(1),16);return [n>>16,(n>>8)&255,n&255];});
- const mouse={x:-9999,y:-9999};
+ const mouse={x:-9999,y:-9999};const sparks=[];
+ function spawn(cx,cy,n,cols){cols=cols&&cols.length?cols:PAL;for(let i=0;i<n;i++){const a=Math.random()*6.283,sp=(1+Math.random()*4.5)*dpr;sparks.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-2*dpr,life:1,c:cols[i%cols.length]});}}
  function resize(){dpr=Math.min(window.devicePixelRatio||1,2);w=cv.width=innerWidth*dpr;h=cv.height=innerHeight*dpr;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';}
  function init(){const n=Math.min(120,Math.floor(innerWidth*innerHeight/11000));pts=[];for(let i=0;i<n;i++){const k=i%PAL.length;pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3*dpr,vy:(Math.random()-.5)*.3*dpr,c:PAL[k],rgb:RGB[k]});}}
  function rgba(r,a){return 'rgba('+r[0]+','+r[1]+','+r[2]+','+a+')';}
@@ -533,13 +542,16 @@ setInterval(renderHeader,60000);
    if(d<D){const o=(1-d/D)*.5,g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);g.addColorStop(0,rgba(a.rgb,o));g.addColorStop(1,rgba(b.rgb,o));ctx.strokeStyle=g;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
   if(mouse.x>-9000)for(const p of pts){const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.hypot(dx,dy);if(d<DM){ctx.strokeStyle=rgba(p.rgb,(1-d/DM)*.75);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();}}
   for(const p of pts){ctx.fillStyle=p.c;ctx.shadowBlur=9*dpr;ctx.shadowColor=p.c;ctx.beginPath();ctx.arc(p.x,p.y,2*dpr,0,7);ctx.fill();}
-  ctx.shadowBlur=0;
+  for(let i=sparks.length-1;i>=0;i--){const s=sparks[i];s.x+=s.vx;s.y+=s.vy;s.vy+=.07*dpr;s.life-=.018;if(s.life<=0){sparks.splice(i,1);continue;}ctx.globalAlpha=Math.max(0,s.life);ctx.fillStyle=s.c;ctx.shadowBlur=12*dpr;ctx.shadowColor=s.c;ctx.beginPath();ctx.arc(s.x,s.y,2.6*dpr,0,7);ctx.fill();}
+  ctx.globalAlpha=1;ctx.shadowBlur=0;
   requestAnimationFrame(tick);
  }
  resize();init();tick();
+ window.__burst=(cx,cy,n,cols)=>spawn(cx*dpr,cy*dpr,n||20,cols);
  let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{resize();init();},200);});
  addEventListener('mousemove',e=>{mouse.x=e.clientX*dpr;mouse.y=e.clientY*dpr;});
  addEventListener('mouseleave',()=>{mouse.x=mouse.y=-9999;});
+ addEventListener('pointerdown',e=>{spawn(e.clientX*dpr,e.clientY*dpr,14,PAL);});
  addEventListener('touchmove',e=>{const tc=e.touches[0];if(tc){mouse.x=tc.clientX*dpr;mouse.y=tc.clientY*dpr;}},{passive:true});
  addEventListener('touchend',()=>{mouse.x=mouse.y=-9999;});
 })();
