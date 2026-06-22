@@ -37,6 +37,31 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 @keyframes floatB{50%{transform:translate(-50px,-34px) scale(1.1)}}
 .vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 50% 22%,transparent 48%,rgba(7,11,18,.62) 100%)}
 .card,.icard,.plan-card,.scard,.stat-tile,.metric,.tipbox{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+
+/* 开机自检 */
+#boot{position:fixed;inset:0;z-index:300;background:#0a111c;display:flex;align-items:center;justify-content:center;transition:opacity .6s}
+#boot.hide{opacity:0;pointer-events:none}
+.boot-box{width:min(440px,86vw);font-family:var(--mono)}
+.boot-logo{font-size:32px;font-weight:800;letter-spacing:7px;color:var(--accent);text-align:center;text-shadow:0 0 22px var(--glow);margin-bottom:20px;animation:bootflick 1.4s steps(2) infinite}
+@keyframes bootflick{48%{opacity:1}50%{opacity:.55}52%{opacity:1}}
+.boot-log{font-size:11.5px;color:var(--muted);line-height:2;min-height:130px;white-space:pre-wrap}
+.boot-log b{color:var(--ok)}
+.boot-trk{height:4px;background:var(--surface2);border-radius:4px;overflow:hidden;margin-top:14px;border:1px solid var(--line)}
+.boot-bar{height:100%;width:0;background:linear-gradient(90deg,var(--accent2),var(--accent));box-shadow:0 0 12px var(--glow);transition:width .25s}
+.boot-skip{text-align:center;font-size:9.5px;letter-spacing:2px;color:var(--dim);margin-top:14px;text-transform:uppercase}
+
+/* HUD 四角定位框 */
+.corner{position:absolute;width:24px;height:24px;border:2px solid var(--accent);z-index:3;opacity:.55;pointer-events:none;animation:cornpulse 3s ease-in-out infinite}
+@keyframes cornpulse{50%{opacity:.9;box-shadow:0 0 10px var(--glow)}}
+.corner.tl{top:11px;left:11px;border-right:none;border-bottom:none}
+.corner.tr{top:11px;right:11px;border-left:none;border-bottom:none}
+.corner.bl{bottom:11px;left:11px;border-right:none;border-top:none}
+.corner.br{bottom:11px;right:11px;border-left:none;border-top:none}
+
+/* 激励标语轮播 */
+.ticker{margin-top:13px;font-family:var(--mono);font-size:11.5px;letter-spacing:.5px;color:var(--accent);min-height:17px;text-shadow:0 0 8px rgba(34,211,238,.35)}
+.ticker .cur{animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
 .wrap{max-width:880px;margin:0 auto;padding:0 16px}
 @media(min-width:768px){.wrap{padding:0 24px}}
 
@@ -205,6 +230,12 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 </style>
 </head>
 <body>
+<div id="boot"><div class="boot-box">
+  <div class="boot-logo">FIT·OS</div>
+  <div class="boot-log" id="bootlog"></div>
+  <div class="boot-trk"><div class="boot-bar" id="bootbar"></div></div>
+  <div class="boot-skip">TAP TO SKIP</div>
+</div></div>
 <div class="aurora"></div>
 <canvas id="net"></canvas>
 <div class="bg-grid-full"></div>
@@ -216,6 +247,7 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
   <div class="hud">
     <div class="hud-grid"></div><div class="hud-glow g1"></div><div class="hud-glow g2"></div><div class="scan"></div>
     <svg class="pulse" viewBox="0 0 1200 80" preserveAspectRatio="none"><polyline points="0,40 210,40 232,40 246,14 262,66 278,40 520,40 700,40 724,40 740,12 756,68 772,40 980,40 1200,40"/></svg>
+    <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
     <div class="wrap hud-inner">
       <div class="hud-topline">
         <div class="sys-tag">FIT·OS 减脂作战系统</div>
@@ -247,6 +279,7 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
         <div class="xptrk"><div class="xpbar" id="xpbar" style="width:0%"></div></div>
       </div>
       <div class="statusbar"><div class="status-led" id="led"></div><div class="status-txt" id="status">系统就绪 · 开始今日打卡</div></div>
+      <div class="ticker" id="ticker"></div>
     </div>
   </div>
   <div class="wrap">
@@ -520,6 +553,28 @@ function animNum(el,to){if(!el)return;const from=parseInt(el.textContent)||0;if(
 
 syncHistory();renderHeader();renderTasks();renderPlanToday();renderTip();updateRing();updateXP();
 setInterval(renderHeader,60000);
+
+// ===== 实时跳秒时钟 =====
+function clock(){const n=new Date(),dn=['SUN','MON','TUE','WED','THU','FRI','SAT'],p=x=>String(x).padStart(2,'0');const el=document.getElementById('sysdate');if(el)el.textContent=n.getFullYear()+'.'+p(n.getMonth()+1)+'.'+p(n.getDate())+' '+dn[n.getDay()]+' · '+p(n.getHours())+':'+p(n.getMinutes())+':'+p(n.getSeconds());}
+clock();setInterval(clock,1000);
+
+// ===== 打字机激励标语 =====
+(function(){const el=document.getElementById('ticker');if(!el)return;
+ const M=['// 自律给你自由','// 今天的汗水，明天的轮廓','// 能量缺口造就改变','// 坚持 > 完美','// 你正在变强，别停','// 把身体当成长期项目'];
+ let li=0,ci=0,del=false;
+ function loop(){const s=M[li];el.innerHTML=s.slice(0,ci)+'<span class="cur">▋</span>';
+  if(!del){ci++;if(ci>s.length){del=true;return setTimeout(loop,1600);}}else{ci--;if(ci<0){del=false;li=(li+1)%M.length;ci=0;}}
+  setTimeout(loop,del?38:78);}
+ loop();})();
+
+// ===== 开机自检序列 =====
+(function(){const boot=document.getElementById('boot');if(!boot)return;
+ if(sessionStorage.getItem('booted')){boot.remove();return;}
+ const lines=['> INITIALIZING FIT·OS v2.0 ...','> 加载用户档案 ............ [ OK ]','> 同步打卡数据 ............ [ OK ]','> 校准代谢引擎 ............ [ OK ]','> 启动作战协议 ............ [ OK ]','> ALL SYSTEMS GO_'];
+ const log=document.getElementById('bootlog'),bar=document.getElementById('bootbar');let i=0;
+ function done(){boot.classList.add('hide');sessionStorage.setItem('booted','1');setTimeout(()=>boot.remove(),700);}
+ function step(){if(i<lines.length){log.innerHTML+=lines[i].replace('[ OK ]','<b>[ OK ]</b>')+'\n';bar.style.width=((i+1)/lines.length*100)+'%';i++;setTimeout(step,280);}else setTimeout(done,450);}
+ step();boot.addEventListener('click',done);})();
 
 // ===== 全屏多彩粒子网络（鼠标/触摸互动）=====
 (function(){
