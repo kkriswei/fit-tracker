@@ -190,6 +190,19 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 .badge .bn{font-size:11px;font-weight:600;margin-top:6px;color:var(--text)}
 .badge .bdsc{font-size:9.5px;color:var(--muted);margin-top:3px;line-height:1.3}
 
+/* 打卡日历 */
+.cal-head{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.cal-head span{text-align:center;font-family:var(--mono);font-size:9px;color:var(--dim)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-cell{aspect-ratio:1;border-radius:7px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:11px;color:var(--muted)}
+.cal-cell.empty{border:none}
+.cal-cell.today{box-shadow:0 0 0 1.5px var(--accent),0 0 10px var(--glow)}
+.cal-foot{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:12px;display:flex;justify-content:space-between}
+.cal-foot b{color:var(--accent)}
+
+/* 3D 能量核心 */
+#three{position:absolute;inset:0;z-index:0;pointer-events:none;opacity:.5}
+
 /* settings */
 .scard{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:16px;margin-bottom:10px}
 .scard h3{font-family:var(--mono);font-size:12px;letter-spacing:1px;color:var(--text);text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
@@ -262,6 +275,7 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 <!-- ===== TODAY ===== -->
 <div id="page-today" class="page active">
   <div class="hud">
+    <canvas id="three"></canvas>
     <div class="hud-grid"></div><div class="hud-glow g1"></div><div class="hud-glow g2"></div><div class="scan"></div>
     <svg class="pulse" viewBox="0 0 1200 80" preserveAspectRatio="none"><polyline points="0,40 210,40 232,40 246,14 262,66 278,40 520,40 700,40 724,40 740,12 756,68 772,40 980,40 1200,40"/></svg>
     <span class="corner tl"></span><span class="corner tr"></span><span class="corner bl"></span><span class="corner br"></span>
@@ -313,6 +327,12 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
   <div class="phero"><div class="hud-grid"></div><div class="wrap"><h1>作战计划</h1><div class="sub">Nutrition & Training Protocol</div></div></div>
   <div class="wrap" style="padding-top:14px">
     <div id="plan-full"></div>
+    <div class="seclbl">营养预算 / MACROS</div>
+    <div class="card" style="padding:16px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+      <canvas id="macroRing" style="flex-shrink:0;width:130px;height:130px"></canvas>
+      <div style="flex:1;min-width:150px" id="macroLegend"></div>
+    </div>
+    <div style="padding:6px 4px 0"><span id="macroNote" style="font-family:var(--mono);font-size:10px;color:var(--dim)"></span></div>
     <div class="seclbl">饮食原则 / NUTRITION</div>
     <div class="icard">
       <h4>盘子法则 PLATE RULE</h4>
@@ -345,6 +365,11 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
       <div class="stat-tile"><div class="stat-big mono" id="d-perf">0</div><div class="stat-k">完美天数 / PERFECT</div></div>
     </div>
     <div class="blk"><h3>最近 7 天 / 7-DAY LOG</h3><div class="bars" id="bars"></div></div>
+    <div class="blk"><h3 id="cal-title">打卡日历 / CHECK-IN</h3>
+      <div class="cal-head" id="cal-wd"></div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="cal-foot" id="cal-foot"></div>
+    </div>
     <div class="blk"><h3>成就 / ACHIEVEMENTS</h3><div class="badges" id="badges"></div></div>
     <div style="height:14px"></div>
   </div>
@@ -426,6 +451,7 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 <div class="toast" id="toast"></div>
 <div class="lvflash" id="lvflash"><div class="le" id="lv-e">⚡</div><div class="ll">LEVEL UP</div><div class="ln" id="lv-n"></div></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
 const TASKS=[
  {id:'t01',time:'07:00',sec:'晨间 / MORNING',icon:'⚖️',tag:'称重',title:'晨起称重',desc:'空腹、上厕所后、不穿衣，固定条件称重并记录。看一周趋势，不要被单日水盐波动（±1-2斤很正常）影响心态。'},
@@ -481,7 +507,7 @@ const BADGES=[
 ];
 const XP_TASK=10, XP_PERFECT=50;
 
-function dk(d){d=d||new Date();return d.toISOString().split('T')[0];}
+function dk(d){d=d||new Date();const p=x=>String(x).padStart(2,'0');return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate());}
 function getDone(){return JSON.parse(localStorage.getItem('day_'+dk())||'[]');}
 function setDone(a){localStorage.setItem('day_'+dk(),JSON.stringify(a));syncHistory();}
 function syncHistory(){const h=JSON.parse(localStorage.getItem('history')||'{}');h[dk()]={done:getDone().length,total:TASKS.length};localStorage.setItem('history',JSON.stringify(h));}
@@ -584,6 +610,7 @@ function renderData(){
    +'<div class="bd" style="color:'+(it?'var(--accent)':'var(--muted)')+'">'+dn[d.getDay()]+'</div></div>';}
  document.getElementById('bars').innerHTML=bh;
  document.getElementById('badges').innerHTML=BADGES.map(b=>{const u=b.c(s);return '<div class="badge'+(u?'':' lock')+'"><div class="be">'+(u?b.e:'⬡')+'</div><div class="bn">'+b.n+'</div><div class="bdsc">'+b.d+'</div></div>';}).join('');
+ renderCalendar();
 }
 function renderSched(){
  document.getElementById('topic').value=localStorage.getItem('ntfy_topic')||'';
@@ -643,7 +670,35 @@ function showPage(p){
  window.scrollTo(0,0);
  if(p==='data')renderData();
  if(p==='body')renderBody();
+ if(p==='plan')renderMacros();
  if(p==='settings')renderSched();
+}
+function renderCalendar(){
+ const wd=document.getElementById('cal-wd');if(!wd)return;
+ wd.innerHTML=['日','一','二','三','四','五','六'].map(d=>'<span>'+d+'</span>').join('');
+ const h=JSON.parse(localStorage.getItem('history')||'{}'),n=new Date(),y=n.getFullYear(),mo=n.getMonth(),tk=dk();
+ document.getElementById('cal-title').textContent=(mo+1)+'月打卡日历 / CHECK-IN';
+ const first=new Date(y,mo,1).getDay(),days=new Date(y,mo+1,0).getDate();let html='',cnt=0;
+ for(let i=0;i<first;i++)html+='<div class="cal-cell empty"></div>';
+ for(let d=1;d<=days;d++){const key=dk(new Date(y,mo,d,12)),v=h[key],pct=v?v.done/v.total:0;if(pct>0)cnt++;
+  const st=pct>0?'background:rgba(34,211,238,'+(0.15+pct*0.6).toFixed(2)+');border-color:rgba(34,211,238,'+(0.3+pct*0.5).toFixed(2)+');color:#eaffff':'';
+  html+='<div class="cal-cell'+(key===tk?' today':'')+'" style="'+st+'">'+d+'</div>';}
+ document.getElementById('cal-grid').innerHTML=html;
+ document.getElementById('cal-foot').innerHTML='<span>本月打卡 <b>'+cnt+'</b> 天</span><span>当前连续 <b>'+calcStats().ms+'</b> 天 🔥</span>';
+}
+function renderMacros(){
+ const cv=document.getElementById('macroRing');if(!cv||!cv.getContext)return;
+ const wa=wArr(),cur=wa.length?wa[wa.length-1].kg:(parseFloat(localStorage.getItem('goalW'))||70);
+ const maint=Math.round(cur*30),target=maint-400,protG=Math.round(cur*1.8),fatG=Math.round(cur*0.8);
+ const protC=protG*4,fatC=fatG*9;let carbC=target-protC-fatC;if(carbC<0)carbC=0;const carbG=Math.round(carbC/4);
+ const segs=[{n:'蛋白质',g:protG,c:protC,col:'#22d3ee'},{n:'碳水',g:carbG,c:carbC,col:'#a855f7'},{n:'脂肪',g:fatG,c:fatC,col:'#fbbf24'}];
+ const tot=segs.reduce((a,s)=>a+s.c,0)||1,ctx=cv.getContext('2d'),dpr=Math.min(window.devicePixelRatio||1,2);
+ cv.width=130*dpr;cv.height=130*dpr;ctx.scale(dpr,dpr);ctx.clearRect(0,0,130,130);
+ let a0=-Math.PI/2;const cx=65,cy=65,r=52;
+ segs.forEach(s=>{const a1=a0+s.c/tot*Math.PI*2;ctx.beginPath();ctx.arc(cx,cy,r,a0,a1);ctx.strokeStyle=s.col;ctx.lineWidth=14;ctx.shadowBlur=8;ctx.shadowColor=s.col;ctx.stroke();a0=a1;});
+ ctx.shadowBlur=0;ctx.fillStyle='#eef4fb';ctx.font='700 22px monospace';ctx.textAlign='center';ctx.fillText(target,cx,cy-2);ctx.fillStyle='#8294aa';ctx.font='9px monospace';ctx.fillText('KCAL/日',cx,cy+13);
+ document.getElementById('macroLegend').innerHTML=segs.map(s=>'<div style="display:flex;align-items:center;gap:8px;padding:6px 0;font-family:var(--mono);font-size:12px"><i style="width:10px;height:10px;border-radius:3px;background:'+s.col+';display:inline-block"></i><span style="flex:1;color:var(--text)">'+s.n+'</span><b style="color:'+s.col+'">'+s.g+' g</b></div>').join('');
+ document.getElementById('macroNote').textContent='基于当前体重 '+cur.toFixed(0)+'kg 估算：维持≈'+maint+' kcal，减脂缺口 -400。仅供参考。';
 }
 function saveTopic(){const v=document.getElementById('topic').value.trim();if(v){localStorage.setItem('ntfy_topic',v);toast('✓ ntfy 主题已保存');}}
 function resetToday(){if(confirm('重置今日打卡？')){localStorage.removeItem('day_'+dk());syncHistory();renderTasks();updateRing();updateXP();toast('已重置今日');}}
@@ -675,6 +730,20 @@ clock();setInterval(clock,1000);
  function done(){boot.classList.add('hide');sessionStorage.setItem('booted','1');setTimeout(()=>boot.remove(),700);}
  function step(){if(i<lines.length){log.innerHTML+=lines[i].replace('[ OK ]','<b>[ OK ]</b>')+'\n';bar.style.width=((i+1)/lines.length*100)+'%';i++;setTimeout(step,280);}else setTimeout(done,450);}
  step();boot.addEventListener('click',done);})();
+
+// ===== 3D 能量核心（Three.js 旋转线框）=====
+(function(){
+ if(typeof THREE==='undefined')return;
+ const cv=document.getElementById('three');if(!cv)return;const hud=cv.parentElement;
+ let renderer;try{renderer=new THREE.WebGLRenderer({canvas:cv,alpha:true,antialias:true});}catch(e){return;}
+ const scene=new THREE.Scene(),cam=new THREE.PerspectiveCamera(50,1,0.1,100);cam.position.z=3.4;
+ const outer=new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(1.3,1)),new THREE.LineBasicMaterial({color:0x22d3ee,transparent:true,opacity:.6}));
+ const inner=new THREE.LineSegments(new THREE.WireframeGeometry(new THREE.IcosahedronGeometry(0.72,0)),new THREE.LineBasicMaterial({color:0xa855f7,transparent:true,opacity:.55}));
+ scene.add(outer);scene.add(inner);
+ function size(){const w=hud.clientWidth||360,h=hud.clientHeight||320;renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,2));renderer.setSize(w,h,false);cam.aspect=w/h;cam.updateProjectionMatrix();}
+ size();let rt;addEventListener('resize',()=>{clearTimeout(rt);rt=setTimeout(size,200);});
+ (function loop(){outer.rotation.x+=0.0028;outer.rotation.y+=0.0046;inner.rotation.x-=0.006;inner.rotation.y-=0.004;renderer.render(scene,cam);requestAnimationFrame(loop);})();
+})();
 
 // ===== 全屏多彩粒子网络（鼠标/触摸互动）=====
 (function(){
