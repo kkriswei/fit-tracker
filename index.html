@@ -23,16 +23,19 @@ html{background:var(--bg)}
 body{font-family:var(--sans);background:transparent;color:var(--text);min-height:100vh;padding-bottom:84px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 .mono{font-family:var(--mono)}
 
-/* ===== 全屏科技背景 ===== */
-#net{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
-.bg-grid-full{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;opacity:.07;animation:gridDrift 32s linear infinite}
-.bg-orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none;opacity:.3}
-.bg-orb.a{width:360px;height:360px;background:#0e7490;top:-110px;left:-90px;animation:floatA 20s ease-in-out infinite}
-.bg-orb.b{width:320px;height:320px;background:#1e3a8a;bottom:-130px;right:-70px;animation:floatB 26s ease-in-out infinite}
-.bg-orb.c{width:260px;height:260px;background:#155e75;top:46%;left:62%;animation:floatA 30s ease-in-out infinite}
-@keyframes floatA{50%{transform:translate(46px,34px) scale(1.1)}}
-@keyframes floatB{50%{transform:translate(-46px,-30px) scale(1.08)}}
-.vignette{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 30%,transparent 55%,rgba(8,12,20,.55) 100%)}
+/* ===== 全屏科技背景（多彩） ===== */
+.aurora{position:fixed;inset:-45%;z-index:0;pointer-events:none;filter:blur(110px) saturate(1.4);opacity:.55;background:conic-gradient(from 0deg at 50% 50%,#0ea5e9,#6366f1,#a855f7,#ec4899,#f59e0b,#22d3ee,#14b8a6,#0ea5e9);animation:auroraSpin 36s linear infinite}
+@keyframes auroraSpin{to{transform:rotate(360deg)}}
+#net{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.92}
+.bg-grid-full{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(rgba(150,190,225,.5) 1px,transparent 1px),linear-gradient(90deg,rgba(150,190,225,.5) 1px,transparent 1px);background-size:50px 50px;opacity:.05;animation:gridDrift 32s linear infinite}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(80px);z-index:0;pointer-events:none;opacity:.5;mix-blend-mode:screen}
+.bg-orb.a{width:360px;height:360px;background:#22d3ee;top:-110px;left:-90px;animation:floatA 18s ease-in-out infinite}
+.bg-orb.b{width:320px;height:320px;background:#a855f7;bottom:-130px;right:-70px;animation:floatB 24s ease-in-out infinite}
+.bg-orb.c{width:280px;height:280px;background:#ec4899;top:44%;left:64%;animation:floatA 30s ease-in-out infinite}
+.bg-orb.d{width:300px;height:300px;background:#3b82f6;top:62%;left:4%;animation:floatB 27s ease-in-out infinite}
+@keyframes floatA{50%{transform:translate(50px,40px) scale(1.14)}}
+@keyframes floatB{50%{transform:translate(-50px,-34px) scale(1.1)}}
+.vignette{position:fixed;inset:0;z-index:1;pointer-events:none;background:radial-gradient(120% 90% at 50% 22%,transparent 48%,rgba(7,11,18,.62) 100%)}
 .card,.icard,.plan-card,.scard,.stat-tile,.metric,.tipbox{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .wrap{max-width:880px;margin:0 auto;padding:0 16px}
 @media(min-width:768px){.wrap{padding:0 24px}}
@@ -200,9 +203,10 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 </style>
 </head>
 <body>
+<div class="aurora"></div>
 <canvas id="net"></canvas>
 <div class="bg-grid-full"></div>
-<div class="bg-orb a"></div><div class="bg-orb b"></div><div class="bg-orb c"></div>
+<div class="bg-orb a"></div><div class="bg-orb b"></div><div class="bg-orb c"></div><div class="bg-orb d"></div>
 <div class="vignette"></div>
 
 <!-- ===== TODAY ===== -->
@@ -509,25 +513,35 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 syncHistory();renderHeader();renderTasks();renderPlanToday();renderTip();updateRing();updateXP();
 setInterval(renderHeader,60000);
 
-// ===== 全屏粒子星座网络 =====
+// ===== 全屏多彩粒子网络（鼠标/触摸互动）=====
 (function(){
  const cv=document.getElementById('net');if(!cv||!cv.getContext)return;
  const ctx=cv.getContext('2d');let w,h,dpr,pts;
+ const PAL=['#22d3ee','#a855f7','#ec4899','#38bdf8','#34d399','#fbbf24'];
+ const RGB=PAL.map(c=>{const n=parseInt(c.slice(1),16);return [n>>16,(n>>8)&255,n&255];});
+ const mouse={x:-9999,y:-9999};
  function resize(){dpr=Math.min(window.devicePixelRatio||1,2);w=cv.width=innerWidth*dpr;h=cv.height=innerHeight*dpr;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';}
- function init(){const n=Math.min(110,Math.floor(innerWidth*innerHeight/12000));pts=[];for(let i=0;i<n;i++)pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.28*dpr,vy:(Math.random()-.5)*.28*dpr});}
+ function init(){const n=Math.min(120,Math.floor(innerWidth*innerHeight/11000));pts=[];for(let i=0;i<n;i++){const k=i%PAL.length;pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.3*dpr,vy:(Math.random()-.5)*.3*dpr,c:PAL[k],rgb:RGB[k]});}}
+ function rgba(r,a){return 'rgba('+r[0]+','+r[1]+','+r[2]+','+a+')';}
  function tick(){
-  ctx.clearRect(0,0,w,h);
-  const D=140*dpr;
-  for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;}
-  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
-   const a=pts[i],b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
-   if(d<D){const o=(1-d/D)*.45;ctx.strokeStyle='rgba(34,211,238,'+o+')';ctx.lineWidth=1*dpr;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
-  }
-  for(const p of pts){ctx.fillStyle='rgba(56,189,248,.85)';ctx.beginPath();ctx.arc(p.x,p.y,1.6*dpr,0,7);ctx.fill();}
+  ctx.clearRect(0,0,w,h);const D=145*dpr,DM=180*dpr,cap=.55*dpr;
+  for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;
+   if(mouse.x>-9000){const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.hypot(dx,dy)||1;if(d<DM){p.vx+=dx/d*.025*dpr;p.vy+=dy/d*.025*dpr;}}
+   const sp=Math.hypot(p.vx,p.vy);if(sp>cap){p.vx*=cap/sp;p.vy*=cap/sp;}}
+  ctx.lineWidth=1*dpr;
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){const a=pts[i],b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+   if(d<D){const o=(1-d/D)*.5,g=ctx.createLinearGradient(a.x,a.y,b.x,b.y);g.addColorStop(0,rgba(a.rgb,o));g.addColorStop(1,rgba(b.rgb,o));ctx.strokeStyle=g;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}}
+  if(mouse.x>-9000)for(const p of pts){const dx=mouse.x-p.x,dy=mouse.y-p.y,d=Math.hypot(dx,dy);if(d<DM){ctx.strokeStyle=rgba(p.rgb,(1-d/DM)*.75);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(mouse.x,mouse.y);ctx.stroke();}}
+  for(const p of pts){ctx.fillStyle=p.c;ctx.shadowBlur=9*dpr;ctx.shadowColor=p.c;ctx.beginPath();ctx.arc(p.x,p.y,2*dpr,0,7);ctx.fill();}
+  ctx.shadowBlur=0;
   requestAnimationFrame(tick);
  }
  resize();init();tick();
  let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{resize();init();},200);});
+ addEventListener('mousemove',e=>{mouse.x=e.clientX*dpr;mouse.y=e.clientY*dpr;});
+ addEventListener('mouseleave',()=>{mouse.x=mouse.y=-9999;});
+ addEventListener('touchmove',e=>{const tc=e.touches[0];if(tc){mouse.x=tc.clientX*dpr;mouse.y=tc.clientY*dpr;}},{passive:true});
+ addEventListener('touchend',()=>{mouse.x=mouse.y=-9999;});
 })();
 </script>
 </body>
