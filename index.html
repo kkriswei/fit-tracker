@@ -31,7 +31,7 @@
       .ring-big{font-size:64px}
     }
 
-    .hero{padding:54px 0 64px;position:relative;overflow:hidden}
+    .hero{padding:54px 0 64px;position:relative;overflow:hidden;background:linear-gradient(160deg,#1a0533,#4a1060,#8b2fc9)}
     .hero-orbs{position:absolute;inset:0;pointer-events:none}
     .orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:.45}
     .orb1{width:180px;height:180px;background:#f43f5e;top:-60px;right:-40px}
@@ -1816,9 +1816,19 @@ const SCENE_PHOTOS = [
 ];
 
 function renderHeroScene() {
-  const now = new Date();
-  const seed = now.getDate() + now.getMonth() * 31 + 14;
-  const scene = SCENE_PHOTOS[seed % 30];
+  // 洗牌队列：每次打开换一张，轮完整圈才重复，且不连续重复同一张
+  let q = JSON.parse(localStorage.getItem('scene_queue') || '[]');
+  const last = parseInt(localStorage.getItem('scene_last') ?? '-1');
+  if (!q.length) {
+    q = SCENE_PHOTOS.map((_, i) => i);
+    for (let i = q.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [q[i], q[j]] = [q[j], q[i]]; }
+    if (q[0] === last && q.length > 1) { [q[0], q[1]] = [q[1], q[0]]; }
+  }
+  const idx = q.shift();
+  localStorage.setItem('scene_queue', JSON.stringify(q));
+  localStorage.setItem('scene_last', idx);
+  const seed = idx;
+  const scene = SCENE_PHOTOS[idx];
   const el = document.getElementById('hero-scene');
   if (!el) return;
 
