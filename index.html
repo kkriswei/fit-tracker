@@ -1,0 +1,1854 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="减肥">
+  <meta name="theme-color" content="#1a0533">
+  <title>我的减肥计划</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+    html{background:#0f0020;min-height:100vh}
+    body{font-family:-apple-system,'PingFang SC','SF Pro Display',sans-serif;background:#fefcff;color:#18181b;min-height:100vh;padding-bottom:88px;position:relative;overflow-x:hidden}
+
+    .wrap{padding:0 24px;max-width:900px;margin:0 auto}
+    .status-card{max-width:900px;margin:-28px auto 0;left:0;right:0}
+    @media(max-width:640px){
+      .wrap{padding:0 16px;max-width:none}
+      .status-card{margin:-28px 16px 0;max-width:none}
+    }
+    @media(min-width:768px){
+      #task-list{display:grid;grid-template-columns:1fr 1fr;gap:12px;align-items:start}
+      #task-list .sec-lbl-group{grid-column:1/-1}
+      .rec-card,.tip-card{max-width:100%}
+      .hero{padding:60px 40px 80px}
+      .ring-outer{width:200px;height:200px}
+      .rsvg{width:200px;height:200px}
+      .r-track,.r-prog{cx:100;cy:100;r:90}
+      .r-prog{stroke-dasharray:565;stroke-dashoffset:565}
+      .ring-big{font-size:64px}
+    }
+
+    .hero{padding:54px 0 64px;position:relative;overflow:hidden}
+    .hero-orbs{position:absolute;inset:0;pointer-events:none}
+    .orb{position:absolute;border-radius:50%;filter:blur(40px);opacity:.45}
+    .orb1{width:180px;height:180px;background:#f43f5e;top:-60px;right:-40px}
+    .orb2{width:140px;height:140px;background:#06b6d4;bottom:-40px;left:-20px}
+    .orb3{width:100px;height:100px;background:#f59e0b;top:40%;left:60%}
+    .hero-top{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1;margin-bottom:20px}
+    .hpill{background:rgba(255,255,255,0.12);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.2);border-radius:50px;padding:7px 15px;font-size:12px;font-weight:700;color:white;letter-spacing:.3px}
+    .hpill-fire{background:linear-gradient(135deg,rgba(251,146,60,.25),rgba(239,68,68,.25));border-color:rgba(251,146,60,.4)}
+
+    .ring-outer{display:flex;justify-content:center;margin:0 auto 18px;position:relative;z-index:1;width:172px;height:172px}
+    .rsvg{position:absolute;top:0;left:0;transform:rotate(-90deg)}
+    .r-track{fill:none;stroke:rgba(255,255,255,0.1);stroke-width:12}
+    .r-prog{fill:none;stroke-width:12;stroke-linecap:round;stroke-dasharray:490;stroke-dashoffset:490;transition:stroke-dashoffset .9s cubic-bezier(.34,1.56,.64,1)}
+    .ring-inner{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;color:white}
+    .ring-big{font-size:52px;font-weight:800;line-height:1;letter-spacing:-2px}
+    .ring-sub{font-size:13px;opacity:.65;margin-top:2px}
+    .hero-text{text-align:center;color:white;position:relative;z-index:1}
+    .hero-date{font-size:11px;opacity:.6;letter-spacing:.5px;text-transform:uppercase}
+    .hero-greet{font-size:15px;font-weight:600;opacity:.9;margin-top:4px}
+    .xp-row{display:flex;align-items:center;gap:12px;margin-top:16px;position:relative;z-index:1;max-width:400px;margin-left:auto;margin-right:auto}
+    .xp-track{flex:1;height:5px;background:rgba(255,255,255,0.15);border-radius:10px;overflow:hidden}
+    .xp-prog{height:100%;background:linear-gradient(90deg,#fbbf24,#f43f5e);border-radius:10px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+    .xp-txt{font-size:11px;color:rgba(255,255,255,.7);font-weight:600;white-space:nowrap}
+
+    .status-card{margin:-28px 16px 0;background:white;border-radius:20px;padding:14px 20px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 32px rgba(139,47,201,.18),0 2px 8px rgba(0,0,0,.06);position:relative;z-index:10}
+    .status-dot{width:8px;height:8px;border-radius:50%;background:linear-gradient(135deg,#8b2fc9,#f43f5e);flex-shrink:0}
+    .status-txt{font-size:13px;font-weight:700;color:#4c1d95}
+
+    .wrap{padding:0 16px}
+    .sec-lbl{font-size:10px;font-weight:800;letter-spacing:2px;color:#a1a1aa;text-transform:uppercase;padding:20px 0 10px}
+
+    .rec-card{border-radius:20px;overflow:hidden;box-shadow:0 4px 24px rgba(139,47,201,.1);margin-bottom:6px}
+    .rec-top{background:linear-gradient(135deg,#2d0066,#6b21a8);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}
+    .rec-title{font-size:14px;font-weight:800;color:white}
+    .rec-badge{font-size:10px;background:rgba(255,255,255,.18);color:white;padding:3px 10px;border-radius:20px;font-weight:700}
+    .rec-list{background:white}
+    .rec-item{display:flex;gap:10px;padding:10px 16px;border-bottom:1px solid #f4f0ff;align-items:flex-start}
+    .rec-item:last-child{border-bottom:none}
+    .rec-icon{font-size:16px;margin-top:1px;flex-shrink:0}
+    .rec-tag{font-size:10px;font-weight:800;color:#7c3aed;background:#f3f0ff;padding:2px 8px;border-radius:20px;flex-shrink:0;white-space:nowrap;margin-top:2px}
+    .rec-content{font-size:13px;color:#3f3f46;line-height:1.5}
+
+    .task-group{background:white;border-radius:20px;overflow:hidden;box-shadow:0 2px 16px rgba(0,0,0,.05);margin-bottom:10px}
+    .group-header{padding:12px 16px 6px;display:flex;align-items:center;gap:8px}
+    .group-icon{font-size:14px}
+    .group-name{font-size:11px;font-weight:800;letter-spacing:1.5px;color:#a1a1aa;text-transform:uppercase}
+
+    .task-row{display:flex;align-items:center;gap:12px;padding:12px 16px;cursor:pointer;user-select:none;transition:background .15s;position:relative}
+    .task-row:not(:last-child)::after{content:'';position:absolute;bottom:0;left:60px;right:0;height:1px;background:#f4f4f5}
+    .task-row:active{background:#faf5ff}
+
+    .t-ico-wrap{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;transition:transform .2s}
+    .task-row.done .t-ico-wrap{transform:scale(.92)}
+
+    .t-info{flex:1;min-width:0}
+    .t-name{font-size:14px;font-weight:700;color:#18181b;transition:all .2s;line-height:1.3}
+    .task-row.done .t-name{color:#a78bfa;text-decoration:line-through}
+    .t-meta{display:flex;align-items:center;gap:6px;margin-top:4px}
+    .t-time{font-size:10px;font-weight:700;color:#8b5cf6;background:#f3f0ff;padding:2px 7px;border-radius:20px}
+    .t-xp{font-size:10px;font-weight:700;color:#d97706;background:#fef3c7;padding:2px 7px;border-radius:20px}
+
+    .t-expand{font-size:10px;color:#d4d4d8;transition:transform .3s;flex-shrink:0;padding:4px}
+    .task-row.open .t-expand{transform:rotate(180deg)}
+
+    .t-check{width:28px;height:28px;border-radius:50%;border:2px solid #e4e4e7;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;transition:all .3s cubic-bezier(.34,1.56,.64,1);cursor:pointer;background:white}
+    .task-row.done .t-check{background:linear-gradient(135deg,#8b5cf6,#ec4899);border-color:transparent;color:white;box-shadow:0 4px 12px rgba(139,92,246,.4);transform:scale(1.1)}
+
+    .t-body{max-height:0;overflow:hidden;transition:max-height .35s cubic-bezier(.4,0,.2,1)}
+    .task-row.open + .t-body{max-height:180px}
+    .t-body-inner{font-size:13px;color:#52525b;line-height:1.7;padding:2px 16px 14px 66px}
+    .task-row.done + .t-body .t-body-inner{color:#c4b5fd}
+
+    .ico-morning{background:#fff7ed}
+    .ico-commute{background:#eff6ff}
+    .ico-work{background:#f0fdf4}
+    .ico-work2{background:#fdf4ff}
+    .ico-evening{background:#fff1f2}
+    .ico-sleep{background:#eef2ff}
+
+    .tip-card{background:linear-gradient(135deg,#fdf4ff,#fce7f3);border-radius:18px;padding:16px;border:1px solid #f0abfc;margin-bottom:6px}
+    .tip-head{font-size:13px;font-weight:800;color:#9333ea;margin-bottom:6px}
+    .tip-body{font-size:13px;color:#7e22ce;line-height:1.7}
+
+    .page-hero{background:linear-gradient(160deg,#1a0533,#6b21a8);padding:56px 20px 28px;color:white;text-align:center}
+    @media(min-width:768px){.page-hero,.lv-hero{padding:60px 40px 36px}}
+    .page-hero h1{font-size:22px;font-weight:800;letter-spacing:-.5px}
+    .page-hero p{font-size:13px;opacity:.8;margin-top:5px}
+    .icard{background:white;border-radius:18px;padding:14px 16px;margin-bottom:8px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+    .icard h4{font-size:12px;font-weight:800;color:#a1a1aa;letter-spacing:1px;text-transform:uppercase;margin-bottom:10px}
+    .irow{display:flex;gap:8px;padding:7px 0;border-bottom:1px solid #f4f4f5;align-items:flex-start}
+    .irow:last-child{border-bottom:none}
+    .itag{font-size:10px;font-weight:800;color:#7c3aed;background:#f3f0ff;padding:2px 8px;border-radius:20px;white-space:nowrap;flex-shrink:0;margin-top:2px}
+    .itxt{font-size:13px;color:#3f3f46;line-height:1.5}
+    .inote{font-size:11px;color:#a1a1aa}
+
+    .lv-hero{background:linear-gradient(160deg,#1a0533,#4a1060,#8b2fc9);padding:56px 24px 28px;text-align:center;color:white;position:relative;overflow:hidden}
+    .lv-hero .orb{opacity:.3}
+    .lv-orb-icon{font-size:64px;margin-bottom:8px;filter:drop-shadow(0 0 20px rgba(255,255,255,.4))}
+    .lv-name{font-size:24px;font-weight:800;letter-spacing:-.5px}
+    .lv-num{font-size:13px;opacity:.7;margin-top:2px;margin-bottom:16px}
+    .lv-next{font-size:12px;opacity:.75;margin-bottom:8px}
+    .lv-track{background:rgba(255,255,255,.15);border-radius:10px;height:8px;margin:0 20px;overflow:hidden}
+    .lv-fill{height:100%;background:linear-gradient(90deg,#fbbf24,#f43f5e);border-radius:10px;transition:width .8s ease}
+    .lv-info{display:flex;justify-content:space-between;font-size:11px;opacity:.65;margin:6px 20px 0}
+
+    .snum-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:14px 16px 0}
+    .snum-card{background:white;border-radius:18px;padding:18px 14px;text-align:center;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+    .snum-big{font-size:30px;font-weight:800;background:linear-gradient(135deg,#8b2fc9,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+    .snum-lbl{font-size:11px;color:#a1a1aa;margin-top:3px;font-weight:600}
+
+    .badges-wrap{padding:0 16px 10px}
+    .badges-wrap h3{font-size:12px;font-weight:800;letter-spacing:2px;color:#a1a1aa;text-transform:uppercase;padding:18px 0 10px}
+    .bg-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .bg-item{background:white;border-radius:16px;padding:14px 8px;text-align:center;box-shadow:0 2px 10px rgba(0,0,0,.04);transition:transform .15s}
+    .bg-item.unlocked{background:linear-gradient(135deg,#fdf4ff,#ede9fe)}
+    .bg-item:active{transform:scale(.96)}
+    .bg-item.locked{opacity:.35}
+    .bg-em{font-size:28px;margin-bottom:5px}
+    .bg-name{font-size:10px;font-weight:800;color:#7c3aed;line-height:1.3}
+    .bg-item.locked .bg-name{color:#a1a1aa}
+    .bg-desc{font-size:9px;color:#a1a1aa;margin-top:2px;line-height:1.3}
+
+    .week-wrap{padding:0 16px 16px}
+    .week-wrap h3{font-size:12px;font-weight:800;letter-spacing:2px;color:#a1a1aa;text-transform:uppercase;padding-bottom:12px}
+
+    .scard{background:white;border-radius:18px;padding:16px;margin:8px 16px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+    .scard h3{font-size:13px;font-weight:800;color:#7c3aed;margin-bottom:12px;letter-spacing:.3px}
+    .sinput{width:100%;border:2px solid #ede9fe;border-radius:12px;padding:12px 14px;font-size:14px;color:#6d28d9;background:#faf5ff;margin-top:6px;font-family:monospace;outline:none;transition:border-color .2s}
+    .sinput:focus{border-color:#8b5cf6}
+    .sbtn{background:linear-gradient(135deg,#7c3aed,#c026d3);color:white;border:none;border-radius:12px;padding:13px;font-size:14px;font-weight:800;width:100%;margin-top:10px;cursor:pointer;font-family:inherit;letter-spacing:.3px;box-shadow:0 4px 16px rgba(139,92,246,.35)}
+    .sghost{background:#f4f4f5;color:#71717a;border:none;border-radius:12px;padding:11px;font-size:13px;width:100%;margin-top:8px;cursor:pointer;font-family:inherit}
+    .sdanger{color:#ef4444}
+    .sstep{display:flex;gap:12px;padding:9px 0;border-bottom:1px solid #f4f4f5}
+    .sstep:last-child{border-bottom:none}
+    .sdot{width:24px;height:24px;border-radius:50%;background:linear-gradient(135deg,#8b5cf6,#ec4899);color:white;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;flex-shrink:0;margin-top:1px}
+    .stxt{font-size:13px;line-height:1.7;color:#3f3f46}
+    .stxt strong{color:#7c3aed;font-weight:800}
+    .nrow{display:flex;gap:10px;padding:7px 0;border-bottom:1px solid #f4f4f5;align-items:flex-start}
+    .nrow:last-child{border-bottom:none}
+
+    /* ─── NAV ─── */
+    .nav-shell{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);z-index:100;width:calc(100% - 48px);max-width:680px}
+    @media(max-width:640px){.nav-shell{width:calc(100% - 28px);max-width:460px}}
+    .bnav{background:rgba(15,0,32,.88);backdrop-filter:blur(24px);border:1px solid rgba(255,255,255,.08);border-radius:50px;display:flex;padding:5px;gap:2px;box-shadow:0 8px 40px rgba(139,47,201,.4),0 2px 8px rgba(0,0,0,.3)}
+    .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;padding:9px 4px;font-size:9px;color:rgba(255,255,255,.3);cursor:pointer;border:none;background:none;gap:3px;font-family:inherit;border-radius:40px;transition:all .25s;white-space:nowrap;font-weight:600;letter-spacing:.5px}
+    .nbtn.active{color:white;background:rgba(139,47,201,.5)}
+    .nbtn.active .nicon{filter:drop-shadow(0 0 6px rgba(196,77,255,.8))}
+    .nicon{font-size:19px;transition:transform .2s}
+    .nbtn.active .nicon{transform:scale(1.1)}
+
+    .page{display:none}
+    .page.active{display:block;animation:pgIn .2s ease}
+    @keyframes pgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+    .toast{position:fixed;bottom:100px;left:50%;transform:translateX(-50%);background:rgba(15,0,32,.92);backdrop-filter:blur(16px);color:white;padding:11px 24px;border-radius:50px;font-size:13px;font-weight:700;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap;z-index:999;box-shadow:0 4px 20px rgba(139,47,201,.4)}
+    .toast.show{opacity:1}
+
+    .particle{position:fixed;pointer-events:none;z-index:9999;animation:pfx .85s ease-out forwards}
+    @keyframes pfx{0%{transform:translateY(0) scale(1) rotate(0deg);opacity:1}100%{transform:translateY(-80px) scale(.3) rotate(20deg);opacity:0}}
+    .xpop{position:fixed;pointer-events:none;z-index:9999;font-size:14px;font-weight:800;color:#fbbf24;text-shadow:0 2px 6px rgba(0,0,0,.4);animation:xfx 1s ease-out forwards}
+    @keyframes xfx{0%{transform:translateY(0);opacity:1}60%{transform:translateY(-45px) scale(1.15);opacity:1}100%{transform:translateY(-85px);opacity:0}}
+
+    .lu-bg{position:fixed;inset:0;background:rgba(10,0,25,.9);display:none;align-items:center;justify-content:center;z-index:9998;backdrop-filter:blur(12px)}
+    .lu-bg.show{display:flex}
+    .lu-box{background:white;border-radius:28px;padding:40px 36px;text-align:center;box-shadow:0 24px 80px rgba(139,47,201,.5);animation:lubop .5s cubic-bezier(.34,1.56,.64,1);max-width:300px;width:90%}
+    @keyframes lubop{0%{transform:scale(.3) rotate(-5deg);opacity:0}100%{transform:scale(1) rotate(0deg);opacity:1}}
+    .lu-em{font-size:72px;filter:drop-shadow(0 0 20px rgba(196,77,255,.5))}
+    .lu-sub{font-size:13px;color:#a1a1aa;margin:10px 0 4px;font-weight:600}
+    .lu-name{font-size:26px;font-weight:800;background:linear-gradient(135deg,#8b2fc9,#f43f5e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:22px}
+    .lu-btn{background:linear-gradient(135deg,#7c3aed,#c026d3);color:white;border:none;border-radius:50px;padding:14px 48px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 6px 20px rgba(139,92,246,.4)}
+
+    /* ─── PET SVG SYSTEM ─── */
+    .pet-svg-wrap { animation: petSvgFloat 3s ease-in-out infinite; display:block; cursor:pointer; user-select:none; }
+    @keyframes heroKenBurns {0%{transform:scale(1.04) translate(0,0)}100%{transform:scale(1.12) translate(-1%,-1%)}}
+    @keyframes petSvgFloat {
+      0%,100% { transform: translateY(0); }
+      50% { transform: translateY(-10px); }
+    }
+    .pet-svg-wrap .eye-lid {
+      transform-box: fill-box;
+      transform-origin: center;
+      animation: eyeBlink 5s infinite;
+    }
+    @keyframes eyeBlink {
+      0%,88%,100% { transform: scaleY(0); opacity: 0; }
+      92% { transform: scaleY(1); opacity: 1; }
+      96% { transform: scaleY(0); opacity: 0; }
+    }
+    .pet-svg-wrap .wiggle-part {
+      transform-box: fill-box;
+      transform-origin: center bottom;
+      animation: earWiggle 4s ease-in-out infinite;
+    }
+    @keyframes earWiggle {
+      0%,100% { transform: rotate(0deg); }
+      25% { transform: rotate(-5deg); }
+      75% { transform: rotate(5deg); }
+    }
+    .pet-svg-wrap.pet-happy { animation: petBounce 0.6s ease-out forwards; }
+    @keyframes petBounce {
+      0% { transform: translateY(0) scale(1); }
+      20% { transform: translateY(-20px) scale(1.1, 0.95); }
+      50% { transform: translateY(-28px) scale(0.95, 1.1); }
+      70% { transform: translateY(-8px) scale(1.05, 0.98); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    .pet-orbit-star {
+      position: absolute;
+      top: 50%; left: 50%;
+      animation: orbitAnim 3s linear infinite;
+      font-size: 14px;
+    }
+    .pet-orbit-star:nth-child(2) { animation-delay: -1s; }
+    .pet-orbit-star:nth-child(3) { animation-delay: -2s; }
+    @keyframes orbitAnim {
+      0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+      100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+    }
+    .pet-legendary .pet-svg-wrap {
+      filter: drop-shadow(0 0 12px gold) drop-shadow(0 0 24px rgba(255,215,0,0.6));
+      animation: petSvgFloat 3s ease-in-out infinite, legendPulse 2s ease-in-out infinite;
+    }
+    @keyframes legendPulse {
+      0%,100% { filter: drop-shadow(0 0 12px gold) drop-shadow(0 0 24px rgba(255,215,0,0.5)); }
+      50% { filter: drop-shadow(0 0 24px gold) drop-shadow(0 0 48px rgba(255,215,0,0.8)); }
+    }
+    @keyframes speechIn{
+      0%{transform:translateY(6px) scale(.9);opacity:0;}
+      100%{transform:translateY(0) scale(1);opacity:1;}
+    }
+    @keyframes orbitSparkle2{
+      0%{transform:rotate(120deg) translateX(50px) rotate(-120deg);}
+      100%{transform:rotate(480deg) translateX(50px) rotate(-480deg);}
+    }
+    @keyframes orbitSparkle3{
+      0%{transform:rotate(240deg) translateX(50px) rotate(-240deg);}
+      100%{transform:rotate(600deg) translateX(50px) rotate(-600deg);}
+    }
+
+    .pet-card{border-radius:24px;padding:20px 16px 16px;margin-bottom:6px;position:relative;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.1)}
+    .pet-card-inner{display:flex;align-items:center;gap:16px;position:relative;z-index:1}
+    .pet-stage-wrap{position:relative;width:100px;height:116px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+    
+    .pet-orbit{position:absolute;width:100%;height:100%;top:0;left:0;pointer-events:none}
+    .orbit-dot{position:absolute;top:50%;left:50%;font-size:12px;margin-top:-6px;margin-left:-6px}
+    .orbit-dot:nth-child(1){animation:orbitSparkle 2.5s linear infinite}
+    .orbit-dot:nth-child(2){animation:orbitSparkle2 2.5s linear infinite}
+    .orbit-dot:nth-child(3){animation:orbitSparkle3 2.5s linear infinite}
+    .pet-info{flex:1;min-width:0}
+    .pet-name{font-size:17px;font-weight:800;letter-spacing:-.3px}
+    .pet-stage-title{font-size:11px;font-weight:700;opacity:.7;margin-top:2px;margin-bottom:10px}
+    .pet-xp-label{font-size:10px;font-weight:700;color:#a1a1aa;margin-bottom:4px}
+    .pet-xp-track{height:6px;background:rgba(0,0,0,.08);border-radius:10px;overflow:hidden;margin-bottom:6px}
+    .pet-xp-fill{height:100%;border-radius:10px;transition:width .8s cubic-bezier(.34,1.56,.64,1)}
+    .pet-xp-txt{font-size:10px;font-weight:600;opacity:.6}
+    .pet-affection{font-size:11px;font-weight:700;opacity:.7;margin-top:4px}
+    .pet-change-btn{display:block;width:100%;background:rgba(255,255,255,.35);border:1.5px solid rgba(255,255,255,.5);border-radius:50px;padding:8px;font-size:12px;font-weight:700;color:inherit;cursor:pointer;font-family:inherit;margin-top:10px;backdrop-filter:blur(4px);transition:background .15s}
+    .pet-change-btn:active{background:rgba(255,255,255,.5)}
+    .pet-speech{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:white;border-radius:16px;padding:10px 14px;font-size:13px;font-weight:600;color:#3f3f46;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:20;animation:speechIn .25s ease-out;pointer-events:none;max-width:200px;white-space:normal;text-align:center}
+    .pet-speech::after{content:'';position:absolute;top:100%;left:50%;transform:translateX(-50%);border:6px solid transparent;border-top-color:white}
+    .pet-heart{position:fixed;pointer-events:none;z-index:9999;font-size:20px;animation:heartFloat .8s ease-out forwards}
+
+    /* ─── PET SELECTOR MODAL ─── */
+    .pet-modal-bg{position:fixed;inset:0;background:rgba(10,0,25,.7);z-index:9990;display:none;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)}
+    .pet-modal-bg.show{display:flex}
+    .pet-modal{background:white;border-radius:28px 28px 0 0;padding:20px 16px 40px;width:100%;max-width:600px;animation:modalUp .3s cubic-bezier(.34,1.56,.64,1)}
+    @keyframes modalUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+    .pet-modal-title{font-size:16px;font-weight:800;color:#18181b;text-align:center;margin-bottom:16px}
+    .pet-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .pet-opt{border-radius:18px;padding:14px 8px;text-align:center;cursor:pointer;border:2.5px solid transparent;transition:all .2s;background:#f8f5ff}
+    .pet-opt.selected{border-color:#8b2fc9;background:linear-gradient(135deg,#fdf4ff,#ede9fe);box-shadow:0 4px 16px rgba(139,47,201,.2)}
+    .pet-opt:active{transform:scale(.96)}
+    .pet-opt-em{font-size:40px;display:block;margin-bottom:5px;width:60px;height:70px;margin:0 auto 5px;overflow:hidden}
+    .pet-opt-em svg{width:60px!important;height:70px!important}
+    .pet-opt-name{font-size:12px;font-weight:800;color:#3f3f46}
+    .pet-opt-stage{font-size:10px;color:#a1a1aa;margin-top:2px}
+
+    /* ─── PET PAGE ─── */
+    .pet-page-hero{padding:56px 20px 28px;text-align:center;color:white;position:relative;overflow:hidden}
+    .pet-big-wrap{position:relative;width:140px;height:163px;margin:0 auto 10px;display:flex;align-items:center;justify-content:center}
+    
+    .pet-stage-timeline{padding:0 16px;margin-bottom:8px}
+    .pet-stage-item{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f4f4f5}
+    .pet-stage-item:last-child{border-bottom:none}
+    .pet-stage-dot{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+    .pet-stage-dot.unlocked{background:linear-gradient(135deg,#8b5cf6,#ec4899);box-shadow:0 4px 12px rgba(139,92,246,.3)}
+    .pet-stage-dot.locked{background:#f4f4f5;font-size:13px}
+    .pet-stage-info{flex:1}
+    .pet-stage-name{font-size:13px;font-weight:700;color:#18181b}
+    .pet-stage-name.locked{color:#a1a1aa}
+    .pet-stage-desc{font-size:11px;color:#a1a1aa;margin-top:2px}
+    .pet-stage-xp{font-size:10px;font-weight:700;color:#8b5cf6;background:#f3f0ff;padding:2px 8px;border-radius:20px;flex-shrink:0}
+
+    @keyframes sceneFall{0%{transform:translateY(-30px) rotate(0deg)}100%{transform:translateY(110vh) rotate(360deg)}}
+    @keyframes sceneDrift{0%{transform:translateX(0)}100%{transform:translateX(120vw)}}
+    @keyframes sceneTwinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.2)}}
+    @keyframes sceneRise{0%{transform:translateY(0);opacity:.8}100%{transform:translateY(-120vh);opacity:0}}
+    @keyframes sceneWave{0%,100%{transform:translateX(0)}50%{transform:translateX(-3%)}}
+    @keyframes scenePulse{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.15)}}
+    @keyframes sceneFlicker{0%,100%{opacity:.6}50%{opacity:1}}
+    @keyframes sceneAurora{0%,100%{transform:skewX(-5deg) scaleY(1)}50%{transform:skewX(5deg) scaleY(1.1)}}
+    @keyframes sceneFloat{0%,100%{transform:translateY(0) rotate(-2deg)}50%{transform:translateY(-15px) rotate(2deg)}}
+    @keyframes sceneSway{0%,100%{transform:rotate(-4deg)}50%{transform:rotate(4deg)}}
+  </style>
+</head>
+<body>
+
+<div class="lu-bg" id="lu-bg" onclick="closeLU()">
+  <div class="lu-box" onclick="event.stopPropagation()">
+    <div class="lu-em" id="lu-em">👑</div>
+    <div class="lu-sub">恭喜你升级啦！</div>
+    <div class="lu-name" id="lu-nm">燃脂高手</div>
+    <button class="lu-btn" onclick="closeLU()">继续加油 ✨</button>
+  </div>
+</div>
+
+<!-- Pet selector modal -->
+<div class="pet-modal-bg" id="pet-modal-bg" onclick="closePetModal()">
+  <div class="pet-modal" onclick="event.stopPropagation()">
+    <div class="pet-modal-title">选择你的宠物 🌟</div>
+    <div class="pet-grid" id="pet-grid"></div>
+  </div>
+</div>
+
+<!-- ═══ TODAY ═══ -->
+<div id="page-today" class="page active">
+  <div class="hero" id="hero-main">
+    <div id="hero-scene" style="position:absolute;inset:0;z-index:0;overflow:hidden"></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(to bottom,rgba(0,0,0,0.05) 0%,rgba(0,0,0,0.3) 100%);z-index:0;pointer-events:none"></div>
+    <div style="position:relative;z-index:1;width:min(600px,100%);margin-left:auto;margin-right:auto;padding:0 28px">
+    <div class="hero-top">
+      <div class="hpill" id="h-lv">Lv.1 减脂新手 🌱</div>
+      <div class="hpill hpill-fire" id="h-st">🔥 0天</div>
+    </div>
+    <div class="ring-outer">
+      <svg class="rsvg" width="172" height="172" viewBox="0 0 172 172">
+        <defs>
+          <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#fbbf24"/>
+            <stop offset="50%" stop-color="#f43f5e"/>
+            <stop offset="100%" stop-color="#c026d3"/>
+          </linearGradient>
+        </defs>
+        <circle class="r-track" cx="86" cy="86" r="78"/>
+        <circle class="r-prog" id="rprog" cx="86" cy="86" r="78" stroke="url(#rg)"/>
+      </svg>
+      <div class="ring-inner">
+        <div class="ring-big" id="ring-n">0</div>
+        <div class="ring-sub">/ 12 完成</div>
+      </div>
+    </div>
+    <div class="hero-text">
+      <div class="hero-date" id="h-date"></div>
+      <div class="hero-greet" id="h-greet"></div>
+    </div>
+    <div class="xp-row">
+      <div class="xp-track"><div class="xp-prog" id="xpprog" style="width:0%"></div></div>
+      <div class="xp-txt" id="xptxt">0/150 XP</div>
+    </div>
+    </div>
+  </div>
+
+  <div class="status-card">
+    <div class="status-dot"></div>
+    <div class="status-txt" id="status-txt">今天还没开始，起来打卡吧 💪</div>
+  </div>
+
+  <div class="wrap">
+    <div class="sec-lbl">我的宠物</div>
+    <div id="today-pet-card"></div>
+    <div class="sec-lbl">今日推荐</div>
+    <div id="daily-rec"></div>
+    <div id="task-list"></div>
+    <div class="tip-card" id="daily-tip"></div>
+    <div style="height:8px"></div>
+  </div>
+</div>
+
+<!-- ═══ MEAL ═══ -->
+<div id="page-meal" class="page">
+  <div class="page-hero"><h1>🥗 减脂饮食指南</h1><p>高蛋白 · 盘子法则 · 不挨饿的吃法</p></div>
+  <div class="wrap" style="padding-top:14px">
+    <div class="sec-lbl">早餐（蛋白质优先）</div>
+    <div class="icard">
+      <h4>怎么吃</h4>
+      <div class="irow"><span class="itag">首选</span><span class="itxt">2个鸡蛋 + 全麦吐司 / 无糖希腊酸奶 <span class="inote">（蛋白质扛饿、稳血糖）</span></span></div>
+      <div class="irow"><span class="itag">加分</span><span class="itxt">一份莓果或半根香蕉 <span class="inote">（纤维+饱腹）</span></span></div>
+      <div class="irow"><span class="itag">避开</span><span class="itxt">甜麦片、白面包、含糖咖啡、油条</span></div>
+    </div>
+    <div class="sec-lbl">午餐（盘子法则）</div>
+    <div class="icard">
+      <div class="irow"><span class="itag">½ 盘</span><span class="itxt">蔬菜（深色为主）</span></div>
+      <div class="irow"><span class="itag">¼ 盘</span><span class="itxt">蛋白质（鸡胸/牛肉/鱼/豆腐）</span></div>
+      <div class="irow"><span class="itag">¼ 盘</span><span class="itxt">主食（糙米/红薯/全麦，少量）</span></div>
+      <div class="irow"><span class="itag">顺序</span><span class="itxt">先吃菜和蛋白质，最后吃主食，血糖更稳</span></div>
+    </div>
+    <div class="tip-card" style="margin-bottom:8px"><div class="tip-head">💡 不挨饿才能长期坚持</div><div class="tip-body">减脂不等于饿肚子。每天比维持热量少 300-500 大卡就够，蛋白质和蔬菜管够吃。极端节食只会掉肌肉、反弹更猛。</div></div>
+    <div class="sec-lbl">晚餐（清淡七分饱）</div>
+    <div class="icard">
+      <div class="irow"><span class="itag">首选</span><span class="itxt">蛋白质 + 大量蔬菜 + 少量主食，睡前3小时吃完</span></div>
+      <div class="irow"><span class="itag">宵夜</span><span class="itxt">尽量不吃，真饿喝一杯无糖酸奶或牛奶</span></div>
+    </div>
+    <div class="sec-lbl">加分习惯</div>
+    <div class="icard">
+      <div class="irow"><span class="itag">多吃</span><span class="itxt">高蛋白、高纤维、深色蔬菜、白肉、鱼虾</span></div>
+      <div class="irow"><span class="itag">少吃</span><span class="itxt">含糖饮料、油炸、精制糖、酒精</span></div>
+      <div class="irow"><span class="itag">必须做</span><span class="itxt">每天喝水 2L 以上 💧 饭前一杯增加饱腹</span></div>
+    </div>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- ═══ STATS ═══ -->
+<div id="page-stats" class="page">
+  <div class="lv-hero">
+    <div class="hero-orbs"><div class="orb orb1" style="opacity:.2"></div><div class="orb orb2" style="opacity:.15"></div></div>
+    <div style="position:relative;z-index:1">
+      <div class="lv-orb-icon" id="s-ico">🌱</div>
+      <div class="lv-name" id="s-nm">减脂新手</div>
+      <div class="lv-num" id="s-num">Lv.1</div>
+      <div class="lv-next" id="s-next">距下一级还需 150 XP</div>
+      <div class="lv-track"><div class="lv-fill" id="s-fill" style="width:0%"></div></div>
+      <div class="lv-info"><span id="s-xlbl">0 XP</span><span id="s-xmax">/ 150 XP</span></div>
+    </div>
+  </div>
+  <div class="snum-grid">
+    <div class="snum-card"><div class="snum-big" id="s-streak">0</div><div class="snum-lbl">🔥 连续打卡</div></div>
+    <div class="snum-card"><div class="snum-big" id="s-txp">0</div><div class="snum-lbl">⭐ 累计XP</div></div>
+    <div class="snum-card"><div class="snum-big" id="s-tasks">0</div><div class="snum-lbl">✅ 完成任务</div></div>
+    <div class="snum-card"><div class="snum-big" id="s-perf">0</div><div class="snum-lbl">💎 完美天数</div></div>
+  </div>
+  <div class="badges-wrap">
+    <h3>成就徽章</h3>
+    <div class="bg-grid" id="bg-grid"></div>
+  </div>
+  <div class="week-wrap">
+    <h3>最近7天</h3>
+    <div style="display:flex;gap:6px" id="week-bars"></div>
+  </div>
+</div>
+
+<!-- ═══ SETTINGS ═══ -->
+<div id="page-settings" class="page">
+  <div class="page-hero"><h1>⚙️ 设置</h1></div>
+  <div class="wrap" style="padding-top:12px">
+    <div class="scard">
+      <h3>📡 ntfy 推送配置</h3>
+      <p style="font-size:13px;color:#71717a;line-height:1.6;margin-bottom:10px">ntfy 免注册，手机装 ntfy App 订阅同一个主题即可收到推送。</p>
+      <label style="font-size:11px;color:#a1a1aa;font-weight:700;letter-spacing:.5px">NTFY 主题名</label>
+      <input class="sinput" id="topic-input" placeholder="填你的 ntfy 主题名...">
+      <button class="sbtn" onclick="saveTopic()">💾 保存</button>
+    </div>
+    <div class="scard">
+      <h3>📱 添加到主屏幕</h3>
+      <div class="sstep"><div class="sdot">1</div><div class="stxt">用 <strong>Safari</strong> 打开此页面</div></div>
+      <div class="sstep"><div class="sdot">2</div><div class="stxt">底部点分享 → 「<strong>添加到主屏幕</strong>」</div></div>
+      <div class="sstep"><div class="sdot">3</div><div class="stxt">打卡记录自动保存在手机上 ✅</div></div>
+    </div>
+    <div class="scard">
+      <h3>🔔 推送时间表</h3>
+      <div id="notif-sch"></div>
+    </div>
+    <div class="scard">
+      <h3>🔄 数据管理</h3>
+      <button class="sghost" onclick="resetToday()">🔁 重置今日打卡</button>
+      <button class="sghost sdanger" onclick="clearAll()">⚠️ 清除所有数据</button>
+    </div>
+    <div style="height:10px"></div>
+  </div>
+</div>
+
+<!-- ═══ PET PAGE ═══ -->
+<div id="page-pet" class="page">
+  <div id="pet-page-content"></div>
+</div>
+
+<div class="nav-shell">
+  <div class="bnav">
+    <button class="nbtn active" id="nav-today" onclick="showPage('today')"><span class="nicon">📋</span>今日</button>
+    <button class="nbtn" id="nav-meal" onclick="showPage('meal')"><span class="nicon">🥗</span>饮食</button>
+    <button class="nbtn" id="nav-stats" onclick="showPage('stats')"><span class="nicon">🏆</span>成就</button>
+    <button class="nbtn" id="nav-pet" onclick="showPage('pet')"><span class="nicon">🐾</span>宠物</button>
+    <button class="nbtn" id="nav-settings" onclick="showPage('settings')"><span class="nicon">⚙️</span>设置</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const TASKS=[
+  {id:'t01',time:'07:00',sec:'🌅 早晨',icon:'⚖️',icoBg:'ico-morning',title:'晨起称重',desc:'起床、上厕所后、空腹、不穿衣，固定条件称一下并记录。看的是【一周趋势】不是单日——水盐波动很正常，别被某天 +0.5kg 吓到。'},
+  {id:'t02',time:'07:30',sec:'🌅 早晨',icon:'🍳',icoBg:'ico-morning',title:'高蛋白早餐',desc:'早餐先吃蛋白质：2个鸡蛋 / 一杯无糖希腊酸奶 / 一份豆制品。蛋白质扛饿、稳血糖，能压住上午想吃零食的冲动，比不吃早餐更不容易暴食。'},
+  {id:'t03',time:'09:30',sec:'💼 白天',icon:'💧',icoBg:'ico-work',title:'补水 500ml',desc:'起来接一大杯水喝掉。很多时候的「饿」其实是渴。喝够水代谢更顺，也能减少不必要的进食。'},
+  {id:'t04',time:'10:30',sec:'💼 白天',icon:'🧍',icoBg:'ico-work',title:'久坐起身',desc:'已经坐很久了。起来走 2 分钟、做几个深蹲或拉伸。NEAT（日常活动消耗）是减脂里被低估的一块，零散动起来积少成多。'},
+  {id:'t05',time:'12:00',sec:'💼 白天',icon:'🥗',icoBg:'ico-work',title:'午餐这样配',desc:'盘子一半蔬菜、四分之一蛋白质、四分之一主食。顺序：先菜和肉，再吃主食。同样的东西换个吃法，血糖更稳、更扛饿、更少囤脂。'},
+  {id:'t06',time:'13:00',sec:'💼 白天',icon:'🚶',icoBg:'ico-work',title:'饭后走一走',desc:'吃完别马上坐下。出去走 10-15 分钟，帮助餐后血糖回落，下午不犯困，顺手又消耗一点。'},
+  {id:'t07',time:'15:00',sec:'💼 白天',icon:'🍫',icoBg:'ico-work2',title:'下午零食陷阱',desc:'嘴馋了？先喝杯水等 10 分钟，多半是无聊不是饿。真饿就吃一小把坚果或一个水果，别碰饼干奶茶——一杯奶茶≈半小时跑步。'},
+  {id:'t08',time:'16:30',sec:'💼 白天',icon:'💧',icoBg:'ico-work2',title:'再补一次水',desc:'下午再喝 400-500ml。保持补水，避免把口渴误当饥饿，也让晚饭前不至于太饿而点多。'},
+  {id:'t09',time:'17:30',sec:'🏃 运动',icon:'🏃',icoBg:'ico-commute',title:'今天的训练',desc:'动起来：力量 30 分钟，或有氧/快走 8000 步。力量保肌肉、垫高基础代谢；有氧多烧点热量。哪怕只做 15 分钟，也远胜于零。'},
+  {id:'t10',time:'19:00',sec:'🌆 晚间',icon:'🍽️',icoBg:'ico-evening',title:'晚餐七分饱',desc:'清淡、七分饱，睡前 3 小时吃完。蛋白质 + 大量蔬菜 + 少量主食。晚上少囤、睡得稳，第二天称重也更友好。'},
+  {id:'t11',time:'21:00',sec:'🌆 晚间',icon:'📝',icoBg:'ico-evening',title:'今日复盘打卡',desc:'花 1 分钟记一下：今天吃得如何、动了没、水喝够没？记录本身就是减脂利器——看得见才控得住。允许不完美，明天继续。'},
+  {id:'t12',time:'22:30',sec:'🌙 入睡',icon:'🌙',icoBg:'ico-sleep',title:'早点睡',desc:'睡不够会升高饥饿素、降低代谢，第二天特别想吃高糖高油。现在放下手机，睡够 7 小时，是最轻松的「减肥动作」。晚安。'},
+];
+const TIPS=[
+  {title:'🔥 能量缺口才是核心',content:'减脂的本质是「吃进去的 < 消耗的」。不用极端节食，每天比维持热量少 300-500 大卡，稳稳掉秤还不反弹、不掉肌肉。'},
+  {title:'🥩 蛋白质优先',content:'每餐先吃蛋白质（蛋、肉、鱼、豆、奶）。蛋白质最扛饿、热效应最高、还保护肌肉，是减脂期最该吃够的营养素。'},
+  {title:'🚶 NEAT 被低估了',content:'刻意运动之外的日常活动（走路、站立、做家务）叫 NEAT，往往比一次健身消耗更多。多站、多走、能爬楼就别坐电梯。'},
+  {title:'💧 喝水也能帮减脂',content:'饭前喝一杯水增加饱腹、减少进食；很多「饿」其实是渴。每天喝够水，代谢更顺，也少吃下不少零食。'},
+  {title:'😴 睡眠决定食欲',content:'睡不够会升高饥饿素、降低瘦素，第二天格外想吃高糖高油。保证 7 小时睡眠，是最省力的减脂手段。'},
+  {title:'📉 看周趋势不看单日',content:'体重每天受水、盐、便、经期影响上下波动 1-2 斤很正常。固定条件称重，看 7 天均线，别为某天的数字焦虑。'},
+];
+const NOTIFS=[
+  {time:'07:00',title:'⚖️ 晨起称重',msg:'空腹固定条件称重，看一周趋势'},
+  {time:'07:30',title:'🍳 高蛋白早餐',msg:'先吃蛋白质，扛饿稳血糖'},
+  {time:'09:30',title:'💧 补水 500ml',msg:'喝一大杯水，别把渴当饿'},
+  {time:'10:30',title:'🧍 久坐起身',msg:'走2分钟+几个深蹲，攒NEAT'},
+  {time:'12:00',title:'🥗 午餐这样配',msg:'半盘菜+蛋白质，先菜后主食'},
+  {time:'13:00',title:'🚶 饭后走一走',msg:'走10-15分钟，稳餐后血糖'},
+  {time:'15:00',title:'🍫 下午零食陷阱',msg:'先喝水等10分钟，真饿吃坚果'},
+  {time:'16:30',title:'💧 再补一次水',msg:'喝400-500ml，晚饭前不至于太饿'},
+  {time:'17:30',title:'🏃 今天的训练',msg:'力量30分或快走8000步'},
+  {time:'19:00',title:'🍽️ 晚餐七分饱',msg:'清淡七分饱，睡前3小时吃完'},
+  {time:'21:00',title:'📝 今日复盘打卡',msg:'记一下吃/动/水，看得见才控得住'},
+  {time:'22:30',title:'🌙 早点睡',msg:'睡够7小时，明天不馋高糖高油'},
+];
+const DAILY_REC=[
+  {breakfast:'蔬菜蛋卷（2蛋）+ 一片全麦吐司 + 黑咖啡',lunch:'烤鸡胸 + 大份杂蔬沙拉（少酱）+ 半碗糙米',dinner:'三文鱼 + 西兰花 + 少量红薯',tip:'今天先把蛋白质吃够：体重(kg)×1.5g 是减脂期的好目标',exercise:'力量训练 30 分钟（深蹲/俯卧撑/划船）+ 走 6000 步'},
+  {breakfast:'无糖希腊酸奶 + 蓝莓 + 一小把杏仁',lunch:'牛肉蔬菜碗（瘦牛肉+大量蔬菜+少量米饭）',dinner:'番茄炖豆腐 + 清炒时蔬',tip:'饭前喝一大杯水，增加饱腹感，自然少吃',exercise:'快走/慢跑 30 分钟，心率到微喘能说话的程度'},
+  {breakfast:'燕麦（无糖）+ 蛋白粉 + 香蕉半根',lunch:'鸡胸卷饼（全麦）+ 生菜番茄 + 无糖酸奶',dinner:'清蒸鱼 + 蒜蓉菠菜 + 少量藜麦',tip:'体重早上空腹称最准，记进表里看周趋势',exercise:'力量：上肢日（俯卧撑/哑铃推举/弯举）+ 走 8000 步'},
+  {breakfast:'两个水煮蛋 + 一个苹果 + 黑咖啡',lunch:'金枪鱼蔬菜沙拉 + 一小份全麦面包',dinner:'瘦猪肉炒杂蔬 + 半碗糙米',tip:'嘴馋时先刷牙或喝茶，打断进食冲动',exercise:'HIIT 15 分钟（开合跳/高抬腿/波比跳）'},
+  {breakfast:'蔬菜豆腐脑 + 一个茶叶蛋',lunch:'照烧鸡腿（去皮）+ 大份蔬菜 + 半碗米饭',dinner:'虾仁炒西葫芦 + 紫菜蛋花汤',tip:'今天主食换成粗粮（糙米/燕麦/红薯），更扛饿',exercise:'力量：下肢日（深蹲/箭步蹲/臀桥）+ 走 6000 步'},
+  {breakfast:'全麦三明治（鸡蛋生菜）+ 无糖豆浆',lunch:'香煎鸡胸 + 烤蔬菜 + 鹰嘴豆',dinner:'白灼虾 + 清炒芥兰 + 少量米饭',tip:'吃饭放慢速度，细嚼 20 分钟，给大脑时间收到饱腹信号',exercise:'快走 40 分钟，或骑车 30 分钟'},
+  {breakfast:'蛋白奶昔（蛋白粉+牛奶+冷冻莓果）',lunch:'牛排沙拉（瘦牛排+大量绿叶+橄榄油少许）',dinner:'番茄龙利鱼 + 西兰花',tip:'称重前别因为前一天吃多就焦虑，水分波动而已',exercise:'全身力量循环 30 分钟 + 走 8000 步'},
+  {breakfast:'希腊酸奶 + 燕麦 + 奇亚籽',lunch:'鸡胸藜麦碗 + 牛油果四分之一',dinner:'豆腐蔬菜汤 + 卤鸡蛋',tip:'外食选「蒸/烤/炖」，避开「炸/糖醋/勾芡」',exercise:'休息日：轻松走 8000-10000 步，做做拉伸'},
+  {breakfast:'两个煎蛋（少油）+ 半个牛油果 + 番茄',lunch:'烤三文鱼 + 芦笋 + 半碗糙米',dinner:'鸡胸西兰花 + 味噌汤',tip:'把零食放在看不见的地方，看不见就少吃',exercise:'力量：推日（卧推/肩推/三头）+ 走 6000 步'},
+  {breakfast:'全麦吐司 + 花生酱（薄）+ 黑咖啡',lunch:'墨西哥鸡肉碗（鸡胸+豆+蔬菜+少量米）',dinner:'清炒虾仁时蔬 + 紫菜汤',tip:'晚上馋了喝杯无糖酸奶或一杯水，多半就过去了',exercise:'慢跑 30 分钟 或 跳绳 15 分钟'},
+  {breakfast:'蔬菜蛋饼 + 无糖豆浆',lunch:'卤牛肉 + 凉拌木耳黄瓜 + 半碗米饭',dinner:'香煎鳕鱼 + 蒜蓉西兰花',tip:'多喝水今天目标 2-2.5L，分次喝完',exercise:'力量：拉日（引体/划船/二头）+ 走 8000 步'},
+  {breakfast:'燕麦粥 + 一勺蛋白粉 + 蓝莓',lunch:'鸡胸沙拉 + 一小份红薯',dinner:'番茄牛腩（少油）+ 清炒油麦菜',tip:'今天别完美主义，吃多一顿没关系，下一顿回正轨即可',exercise:'快走 40 分钟 + 核心训练 10 分钟（平板支撑）'},
+  {breakfast:'水煮蛋2个 + 希腊酸奶 + 草莓',lunch:'照烧豆腐饭（豆腐+大量蔬菜+少量米）',dinner:'白灼鸡胸 + 凉拌菠菜',tip:'坚持两周了！对比一下腰围和精神状态，比体重更真实',exercise:'全身力量循环 30 分钟 + 走 6000 步'},
+  {breakfast:'蛋白奶昔 + 一根香蕉',lunch:'三文鱼牛油果碗 + 杂蔬',dinner:'冬瓜虾仁汤 + 蒸蛋',tip:'奖励自己一下：买件想要的运动装备，正反馈帮你坚持',exercise:'喜欢什么练什么：今天选你最享受的一项运动 30 分钟'},
+];
+const LEVELS=[{xp:0,name:'减脂新手',icon:'🌱'},{xp:150,name:'减脂学徒',icon:'🌿'},{xp:400,name:'自律达人',icon:'💪'},{xp:800,name:'燃脂高手',icon:'🔥'},{xp:1500,name:'减脂王者',icon:'👑'},{xp:3000,name:'身材大师',icon:'🏆'}];
+const BADGES=[
+  {id:'f',icon:'🌟',name:'第一步',desc:'完成第一次打卡',c:s=>s.tt>=1},
+  {id:'s3',icon:'🔥',name:'三天热身',desc:'连续打卡3天',c:s=>s.ms>=3},
+  {id:'s7',icon:'💥',name:'一周战士',desc:'连续打卡7天',c:s=>s.ms>=7},
+  {id:'p1',icon:'⭐',name:'完美一天',desc:'单日完成全部12项',c:s=>s.pd>=1},
+  {id:'t5',icon:'💪',name:'五十连击',desc:'累计完成50个任务',c:s=>s.tt>=50},
+  {id:'t1',icon:'🎯',name:'百步穿杨',desc:'累计完成100个任务',c:s=>s.tt>=100},
+  {id:'s14',icon:'👑',name:'两周王者',desc:'连续打卡14天',c:s=>s.ms>=14},
+  {id:'p3',icon:'💎',name:'三次完美',desc:'三次单日全部完成',c:s=>s.pd>=3},
+  {id:'s30',icon:'🏆',name:'月度传说',desc:'连续打卡30天',c:s=>s.ms>=30},
+];
+const XPT=10,XPB=50;
+
+// ─── PET DATA ───
+const PETS = {
+  luna: {
+    id: 'luna',
+    name: '月兔 Luna',
+    shortName: '月兔',
+    theme: {bg:'linear-gradient(135deg,#f3e8ff,#e9d5ff)', accent:'#9333ea', glow:'#c084fc', text:'#5b21b6'},
+    stages: [
+      {minXP:0,    emoji:'🥚', title:'月光蛋',  desc:'一颗散发着紫色光芒的神秘蛋...'},
+      {minXP:150,  emoji:'🐰', title:'月兔宝宝', desc:'刚出生的小兔子，耳朵软软的'},
+      {minXP:400,  emoji:'🐰', title:'月光少女', desc:'月色映在毛发上，闪着银光'},
+      {minXP:900,  emoji:'🌙', title:'月华使者', desc:'能借月光治愈人心的神奇兔'},
+      {minXP:2000, emoji:'✨', title:'传说月兔', desc:'广寒宫的守护者，永恒的月之使者'},
+    ],
+    taps: ['月亮等我回去呢~','今天喝水了吗？','月光能量充电中...','最爱你了啦！','嗷呜！好开心~']
+  },
+  hana: {
+    id: 'hana',
+    name: '花猫 Hana',
+    shortName: '花猫',
+    theme: {bg:'linear-gradient(135deg,#fce7f3,#fbcfe8)', accent:'#ec4899', glow:'#f472b6', text:'#9d174d'},
+    stages: [
+      {minXP:0,    emoji:'🌸', title:'花瓣种子', desc:'一粒藏着粉色梦想的种子'},
+      {minXP:150,  emoji:'🐱', title:'花猫咪咪', desc:'爱撒娇的粉色小猫'},
+      {minXP:400,  emoji:'🐱', title:'樱花少女', desc:'毛上沾着樱花瓣，香香的'},
+      {minXP:900,  emoji:'🌺', title:'花精灵猫', desc:'能听懂花语的神秘猫咪'},
+      {minXP:2000, emoji:'💮', title:'万花之主', desc:'每走一步都有花朵盛开的传说猫'},
+    ],
+    taps: ['喵～今天也要加油哦！','给你捎来春天的味道~','护肤了吗？','花花很喜欢你！','揉揉我嘛~']
+  },
+  nova: {
+    id: 'nova',
+    name: '星狐 Nova',
+    shortName: '星狐',
+    theme: {bg:'linear-gradient(135deg,#fef9c3,#fde68a)', accent:'#d97706', glow:'#fbbf24', text:'#92400e'},
+    stages: [
+      {minXP:0,    emoji:'⭐', title:'星尘碎片', desc:'从流星雨中落下的金色碎片'},
+      {minXP:150,  emoji:'🦊', title:'星光狐狸', desc:'尾巴发光的调皮小狐'},
+      {minXP:400,  emoji:'🦊', title:'星河少女', desc:'能预见星象的聪慧狐'},
+      {minXP:900,  emoji:'🌟', title:'金星守护', desc:'守护愿望的星之使者'},
+      {minXP:2000, emoji:'💫', title:'传说星狐', desc:'能点亮黑夜中所有星星的至高狐'},
+    ],
+    taps: ['星光祝福送给你！','今天也要闪闪发光哦~','哼，才不是喜欢你呢...','记得早睡！','嘿嘿，摸我头！']
+  },
+  mochi: {
+    id: 'mochi',
+    name: '熊仔 Mochi',
+    shortName: '熊仔',
+    theme: {bg:'linear-gradient(135deg,#dcfce7,#bbf7d0)', accent:'#16a34a', glow:'#4ade80', text:'#14532d'},
+    stages: [
+      {minXP:0,    emoji:'🌿', title:'绿叶宝宝', desc:'一片充满生机的嫩绿叶子'},
+      {minXP:150,  emoji:'🐼', title:'竹林宝宝', desc:'圆滚滚爱吃竹子的熊仔'},
+      {minXP:400,  emoji:'🐼', title:'森林小熊', desc:'跑起来像大球一样可爱'},
+      {minXP:900,  emoji:'🎋', title:'竹林守护', desc:'守护整片竹林的胖胖将军'},
+      {minXP:2000, emoji:'🌲', title:'传说大熊', desc:'能与自然沟通的传说神兽'},
+    ],
+    taps: ['哈啾～(竹子香)','多吃蔬菜哦！','滚来滚去好开心~','抱抱！','你今天运动了吗？']
+  },
+  dra: {
+    id: 'dra',
+    name: '小龙 Dra',
+    shortName: '小龙',
+    theme: {bg:'linear-gradient(135deg,#dbeafe,#bfdbfe)', accent:'#2563eb', glow:'#60a5fa', text:'#1e3a8a'},
+    stages: [
+      {minXP:0,    emoji:'🥚', title:'龙晶蛋',   desc:'蕴含着神秘龙力的闪亮蛋'},
+      {minXP:150,  emoji:'🐉', title:'龙宝宝',   desc:'刚孵化的小龙，翅膀还软'},
+      {minXP:400,  emoji:'🐉', title:'云海少龙', desc:'能在云层间滑翔的小龙'},
+      {minXP:900,  emoji:'💧', title:'碧海龙君', desc:'掌管雨水和泉源的水龙'},
+      {minXP:2000, emoji:'🌊', title:'传说神龙', desc:'能引动天下风云的至上神龙'},
+    ],
+    taps: ['嗷！喷水！','今天喝水了吗～','飞龙在天！','跟我飞吗？','噗！不小心喷你了...']
+  },
+  fae: {
+    id: 'fae',
+    name: '精灵 Fae',
+    shortName: '精灵',
+    theme: {bg:'linear-gradient(135deg,#ccfbf1,#99f6e4)', accent:'#0d9488', glow:'#2dd4bf', text:'#134e4a'},
+    stages: [
+      {minXP:0,    emoji:'🔮', title:'魔法水晶', desc:'沉睡在水晶中的精灵之力'},
+      {minXP:150,  emoji:'🧚', title:'小精灵',   desc:'刚觉醒的翠绿色小精灵'},
+      {minXP:400,  emoji:'🧚', title:'森林使者', desc:'传递自然祝福的精灵少女'},
+      {minXP:900,  emoji:'🌿', title:'精灵祭司', desc:'能与万物生灵交流的神圣精灵'},
+      {minXP:2000, emoji:'🌈', title:'传说精灵', desc:'只在传说中出现的彩虹精灵'},
+    ],
+    taps: ['森林的祝福给你~','今天要好好休息哦！','精灵魔法！','飞啊飞～','我一直在陪你呢']
+  }
+};
+
+
+// ─── PET SVG ILLUSTRATIONS ───
+function getPetSVG(petId, stage) {
+  const svgs = {
+    egg: {
+      luna: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="egg-luna-g" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#f3e8ff"/>
+            <stop offset="100%" stop-color="#c084fc"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="60" cy="78" rx="32" ry="42" fill="url(#egg-luna-g)" stroke="#d8b4fe" stroke-width="2"/>
+        <ellipse cx="60" cy="55" rx="12" ry="8" fill="rgba(255,255,255,0.4)"/>
+        <text x="52" y="85" font-size="18" text-anchor="middle">🌙</text>
+        <path d="M44 90 Q50 86 56 90" stroke="#c084fc" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M38 70 Q40 65 44 68" stroke="#e9d5ff" stroke-width="1" fill="none"/>
+        <path d="M76 72 Q78 67 82 70" stroke="#e9d5ff" stroke-width="1" fill="none"/>
+      </svg>`,
+      hana: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="egg-hana-g" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#fff0f5"/>
+            <stop offset="100%" stop-color="#f9a8d4"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="60" cy="78" rx="32" ry="42" fill="url(#egg-hana-g)" stroke="#fda4af" stroke-width="2"/>
+        <ellipse cx="60" cy="55" rx="12" ry="8" fill="rgba(255,255,255,0.4)"/>
+        <text x="52" y="85" font-size="18" text-anchor="middle">🌸</text>
+        <path d="M44 90 Q50 86 56 90" stroke="#f472b6" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>`,
+      nova: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="egg-nova-g" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#fff7ed"/>
+            <stop offset="100%" stop-color="#fb923c"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="60" cy="78" rx="32" ry="42" fill="url(#egg-nova-g)" stroke="#fdba74" stroke-width="2"/>
+        <ellipse cx="60" cy="55" rx="12" ry="8" fill="rgba(255,255,255,0.4)"/>
+        <text x="52" y="85" font-size="18" text-anchor="middle">⭐</text>
+        <path d="M44 90 Q50 86 56 90" stroke="#f97316" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>`,
+      mochi: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="egg-mochi-g" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#f0fdf4"/>
+            <stop offset="100%" stop-color="#86efac"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="60" cy="78" rx="32" ry="42" fill="url(#egg-mochi-g)" stroke="#4ade80" stroke-width="2"/>
+        <ellipse cx="60" cy="55" rx="12" ry="8" fill="rgba(255,255,255,0.4)"/>
+        <text x="52" y="85" font-size="18" text-anchor="middle">🌿</text>
+        <path d="M44 90 Q50 86 56 90" stroke="#22c55e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>`,
+      dra: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="egg-dra-g" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#e0f2fe"/>
+            <stop offset="100%" stop-color="#38bdf8"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="60" cy="78" rx="32" ry="42" fill="url(#egg-dra-g)" stroke="#7dd3fc" stroke-width="2"/>
+        <ellipse cx="60" cy="55" rx="12" ry="8" fill="rgba(255,255,255,0.4)"/>
+        <text x="52" y="85" font-size="18" text-anchor="middle">💧</text>
+        <path d="M44 90 Q50 86 56 90" stroke="#0ea5e9" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <path d="M38 72 Q40 68 45 71" stroke="#bae6fd" stroke-width="1" fill="none"/>
+        <path d="M75 72 Q77 68 82 71" stroke="#bae6fd" stroke-width="1" fill="none"/>
+      </svg>`,
+      fae: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="egg-fae-g" cx="40%" cy="35%" r="60%">
+            <stop offset="0%" stop-color="#f0fdfa"/>
+            <stop offset="100%" stop-color="#5eead4"/>
+          </radialGradient>
+        </defs>
+        <ellipse cx="60" cy="78" rx="32" ry="42" fill="url(#egg-fae-g)" stroke="#2dd4bf" stroke-width="2"/>
+        <ellipse cx="60" cy="55" rx="12" ry="8" fill="rgba(255,255,255,0.4)"/>
+        <text x="52" y="85" font-size="18" text-anchor="middle">🔮</text>
+        <path d="M44 90 Q50 86 56 90" stroke="#14b8a6" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+      </svg>`,
+    },
+    luna: {
+      baby: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="luna-b-head" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#f5eeff"/>
+            <stop offset="100%" stop-color="#c4a8e8"/>
+          </radialGradient>
+        </defs>
+        <!-- ears -->
+        <ellipse cx="38" cy="34" rx="10" ry="20" fill="#d8bfee" class="wiggle-part"/>
+        <ellipse cx="82" cy="34" rx="10" ry="20" fill="#d8bfee" class="wiggle-part"/>
+        <ellipse cx="38" cy="36" rx="5" ry="13" fill="#f0d0ff" opacity="0.8"/>
+        <ellipse cx="82" cy="36" rx="5" ry="13" fill="#f0d0ff" opacity="0.8"/>
+        <!-- head -->
+        <ellipse cx="60" cy="70" rx="34" ry="32" fill="url(#luna-b-head)"/>
+        <!-- eyes -->
+        <ellipse cx="47" cy="67" rx="9" ry="10" fill="white"/>
+        <ellipse cx="73" cy="67" rx="9" ry="10" fill="white"/>
+        <ellipse cx="48" cy="68" rx="6" ry="7" fill="#9333ea"/>
+        <ellipse cx="74" cy="68" rx="6" ry="7" fill="#9333ea"/>
+        <ellipse cx="49" cy="69" rx="3" ry="3.5" fill="#3b0764"/>
+        <ellipse cx="75" cy="69" rx="3" ry="3.5" fill="#3b0764"/>
+        <circle cx="51" cy="66" r="1.8" fill="white"/>
+        <circle cx="77" cy="66" r="1.8" fill="white"/>
+        <circle cx="47" cy="71" r="1" fill="white" opacity="0.7"/>
+        <circle cx="73" cy="71" r="1" fill="white" opacity="0.7"/>
+        <!-- blink lids -->
+        <ellipse cx="47" cy="67" rx="9" ry="10" fill="#d8bfee" class="eye-lid" opacity="0"/>
+        <ellipse cx="73" cy="67" rx="9" ry="10" fill="#d8bfee" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="36" cy="76" rx="8" ry="5" fill="#f9a8d4" opacity="0.45"/>
+        <ellipse cx="84" cy="76" rx="8" ry="5" fill="#f9a8d4" opacity="0.45"/>
+        <!-- nose -->
+        <ellipse cx="60" cy="78" rx="2.5" ry="1.5" fill="#e879f9" opacity="0.8"/>
+        <!-- mouth -->
+        <path d="M54 82 Q60 87 66 82" stroke="#c026d3" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="116" rx="22" ry="18" fill="#d8bfee"/>
+        <ellipse cx="60" cy="105" rx="16" ry="14" fill="#e8d4ff"/>
+        <!-- paws -->
+        <ellipse cx="44" cy="125" rx="8" ry="5" fill="#d8bfee"/>
+        <ellipse cx="76" cy="125" rx="8" ry="5" fill="#d8bfee"/>
+      </svg>`,
+      full: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="luna-head-g" cx="38%" cy="32%" r="65%">
+            <stop offset="0%" stop-color="#f5eeff"/>
+            <stop offset="100%" stop-color="#c4a8e8"/>
+          </radialGradient>
+          <radialGradient id="luna-body-g" cx="40%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#ede0ff"/>
+            <stop offset="100%" stop-color="#b48fd8"/>
+          </radialGradient>
+        </defs>
+        <!-- ears -->
+        <ellipse cx="37" cy="30" rx="11" ry="24" fill="#c4a8e8" class="wiggle-part"/>
+        <ellipse cx="83" cy="30" rx="11" ry="24" fill="#c4a8e8" class="wiggle-part"/>
+        <ellipse cx="37" cy="32" rx="6" ry="16" fill="#f0c8ff" opacity="0.85"/>
+        <ellipse cx="83" cy="32" rx="6" ry="16" fill="#f0c8ff" opacity="0.85"/>
+        <!-- golden moon accessory -->
+        <path d="M88 18 Q94 14 94 22 Q88 26 82 22 Q86 18 88 18Z" fill="#fbbf24" opacity="0.9"/>
+        <!-- head -->
+        <ellipse cx="60" cy="68" rx="34" ry="33" fill="url(#luna-head-g)"/>
+        <!-- head highlight -->
+        <ellipse cx="46" cy="54" rx="14" ry="10" fill="white" opacity="0.18"/>
+        <!-- large anime eyes -->
+        <ellipse cx="46" cy="66" rx="10" ry="11" fill="white"/>
+        <ellipse cx="74" cy="66" rx="10" ry="11" fill="white"/>
+        <ellipse cx="47" cy="67" rx="7" ry="8" fill="#7c3aed"/>
+        <ellipse cx="75" cy="67" rx="7" ry="8" fill="#7c3aed"/>
+        <ellipse cx="48" cy="68" rx="4" ry="4.5" fill="#3b0764"/>
+        <ellipse cx="76" cy="68" rx="4" ry="4.5" fill="#3b0764"/>
+        <!-- highlights -->
+        <circle cx="51" cy="63" r="2.5" fill="white"/>
+        <circle cx="79" cy="63" r="2.5" fill="white"/>
+        <circle cx="46" cy="72" r="1.2" fill="white" opacity="0.75"/>
+        <circle cx="74" cy="72" r="1.2" fill="white" opacity="0.75"/>
+        <!-- blink lids -->
+        <ellipse cx="46" cy="66" rx="10" ry="11" fill="#c4a8e8" class="eye-lid" opacity="0"/>
+        <ellipse cx="74" cy="66" rx="10" ry="11" fill="#c4a8e8" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="34" cy="76" rx="9" ry="5.5" fill="#f0abfc" opacity="0.45"/>
+        <ellipse cx="86" cy="76" rx="9" ry="5.5" fill="#f0abfc" opacity="0.45"/>
+        <!-- nose -->
+        <ellipse cx="60" cy="79" rx="2.5" ry="1.5" fill="#e879f9" opacity="0.8"/>
+        <!-- mouth -->
+        <path d="M53 83 Q60 89 67 83" stroke="#c026d3" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="24" ry="20" fill="url(#luna-body-g)"/>
+        <ellipse cx="60" cy="107" rx="18" ry="16" fill="#e8d4ff"/>
+        <!-- paws -->
+        <ellipse cx="43" cy="128" rx="9" ry="6" fill="#c4a8e8"/>
+        <ellipse cx="77" cy="128" rx="9" ry="6" fill="#c4a8e8"/>
+        <!-- sparkle on body -->
+        <circle cx="54" cy="110" r="1.5" fill="white" opacity="0.6"/>
+        <circle cx="66" cy="113" r="1" fill="white" opacity="0.6"/>
+      </svg>`
+    },
+    hana: {
+      baby: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="hana-b-head" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fff5f8"/>
+            <stop offset="100%" stop-color="#fbc8d8"/>
+          </radialGradient>
+        </defs>
+        <!-- cat ears -->
+        <path d="M36 50 L30 25 L50 44Z" fill="#f9a8d4" class="wiggle-part"/>
+        <path d="M84 50 L90 25 L70 44Z" fill="#f9a8d4" class="wiggle-part"/>
+        <path d="M37 47 L33 30 L47 44Z" fill="#fce7f3"/>
+        <path d="M83 47 L87 30 L73 44Z" fill="#fce7f3"/>
+        <!-- head -->
+        <ellipse cx="60" cy="72" rx="34" ry="32" fill="url(#hana-b-head)"/>
+        <!-- eyes -->
+        <ellipse cx="47" cy="69" rx="9" ry="10" fill="white"/>
+        <ellipse cx="73" cy="69" rx="9" ry="10" fill="white"/>
+        <ellipse cx="48" cy="70" rx="6" ry="7" fill="#ec4899"/>
+        <ellipse cx="74" cy="70" rx="6" ry="7" fill="#ec4899"/>
+        <ellipse cx="49" cy="71" rx="3" ry="3.5" fill="#831843"/>
+        <ellipse cx="75" cy="71" rx="3" ry="3.5" fill="#831843"/>
+        <circle cx="51" cy="67" r="2" fill="white"/>
+        <circle cx="77" cy="67" r="2" fill="white"/>
+        <circle cx="47" cy="73" r="1" fill="white" opacity="0.7"/>
+        <circle cx="73" cy="73" r="1" fill="white" opacity="0.7"/>
+        <!-- blink lids -->
+        <ellipse cx="47" cy="69" rx="9" ry="10" fill="#fbc8d8" class="eye-lid" opacity="0"/>
+        <ellipse cx="73" cy="69" rx="9" ry="10" fill="#fbc8d8" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="35" cy="78" rx="9" ry="5" fill="#f472b6" opacity="0.45"/>
+        <ellipse cx="85" cy="78" rx="9" ry="5" fill="#f472b6" opacity="0.45"/>
+        <!-- whiskers -->
+        <line x1="30" y1="76" x2="48" y2="78" stroke="#e8c4d0" stroke-width="1"/>
+        <line x1="30" y1="80" x2="48" y2="80" stroke="#e8c4d0" stroke-width="1"/>
+        <line x1="30" y1="84" x2="48" y2="82" stroke="#e8c4d0" stroke-width="1"/>
+        <line x1="90" y1="76" x2="72" y2="78" stroke="#e8c4d0" stroke-width="1"/>
+        <line x1="90" y1="80" x2="72" y2="80" stroke="#e8c4d0" stroke-width="1"/>
+        <line x1="90" y1="84" x2="72" y2="82" stroke="#e8c4d0" stroke-width="1"/>
+        <!-- heart nose -->
+        <path d="M58 80 Q60 78 62 80 Q63 82 60 84 Q57 82 58 80Z" fill="#f472b6"/>
+        <!-- mouth -->
+        <path d="M55 85 Q60 90 65 85" stroke="#e879f9" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="22" ry="18" fill="#fbc8d8"/>
+        <ellipse cx="60" cy="107" rx="16" ry="14" fill="#fce7f3"/>
+      </svg>`,
+      full: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="hana-head-g" cx="38%" cy="32%" r="65%">
+            <stop offset="0%" stop-color="#fff5f8"/>
+            <stop offset="100%" stop-color="#fbc8d8"/>
+          </radialGradient>
+          <radialGradient id="hana-body-g" cx="40%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#ffd6e7"/>
+            <stop offset="100%" stop-color="#f9a8d4"/>
+          </radialGradient>
+        </defs>
+        <!-- cat ears -->
+        <path d="M36 52 L28 22 L52 46Z" fill="#f9a8d4" class="wiggle-part"/>
+        <path d="M84 52 L92 22 L68 46Z" fill="#f9a8d4" class="wiggle-part"/>
+        <path d="M37 49 L32 28 L50 46Z" fill="#fff0f0"/>
+        <path d="M83 49 L88 28 L70 46Z" fill="#fff0f0"/>
+        <!-- flower crown -->
+        <circle cx="75" cy="30" r="5" fill="#fde68a"/>
+        <circle cx="69" cy="25" r="4" fill="#fda4af"/>
+        <circle cx="81" cy="25" r="4" fill="#fda4af"/>
+        <circle cx="75" cy="20" r="4" fill="#fda4af"/>
+        <circle cx="76" cy="30" r="3" fill="#fbbf24"/>
+        <!-- head -->
+        <ellipse cx="60" cy="70" rx="34" ry="33" fill="url(#hana-head-g)"/>
+        <!-- head highlight -->
+        <ellipse cx="46" cy="56" rx="14" ry="10" fill="white" opacity="0.18"/>
+        <!-- eyes -->
+        <ellipse cx="46" cy="68" rx="10" ry="11" fill="white"/>
+        <ellipse cx="74" cy="68" rx="10" ry="11" fill="white"/>
+        <ellipse cx="47" cy="69" rx="7" ry="8" fill="#ec4899"/>
+        <ellipse cx="75" cy="69" rx="7" ry="8" fill="#ec4899"/>
+        <ellipse cx="48" cy="70" rx="4" ry="4.5" fill="#831843"/>
+        <ellipse cx="76" cy="70" rx="4" ry="4.5" fill="#831843"/>
+        <!-- heart highlight left eye -->
+        <path d="M44 65 Q46 63 48 65 Q49 67 46 68.5 Q43 67 44 65Z" fill="white" opacity="0.9"/>
+        <!-- sparkle highlights -->
+        <circle cx="51" cy="65" r="2" fill="white"/>
+        <circle cx="79" cy="65" r="2" fill="white"/>
+        <circle cx="46" cy="74" r="1.2" fill="white" opacity="0.75"/>
+        <circle cx="74" cy="74" r="1.2" fill="white" opacity="0.75"/>
+        <!-- blink lids -->
+        <ellipse cx="46" cy="68" rx="10" ry="11" fill="#fbc8d8" class="eye-lid" opacity="0"/>
+        <ellipse cx="74" cy="68" rx="10" ry="11" fill="#fbc8d8" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="33" cy="78" rx="9" ry="5.5" fill="#f472b6" opacity="0.48"/>
+        <ellipse cx="87" cy="78" rx="9" ry="5.5" fill="#f472b6" opacity="0.48"/>
+        <!-- whiskers -->
+        <line x1="28" y1="75" x2="48" y2="77" stroke="#ddd" stroke-width="1"/>
+        <line x1="28" y1="80" x2="48" y2="80" stroke="#ddd" stroke-width="1"/>
+        <line x1="28" y1="85" x2="48" y2="83" stroke="#ddd" stroke-width="1"/>
+        <line x1="92" y1="75" x2="72" y2="77" stroke="#ddd" stroke-width="1"/>
+        <line x1="92" y1="80" x2="72" y2="80" stroke="#ddd" stroke-width="1"/>
+        <line x1="92" y1="85" x2="72" y2="83" stroke="#ddd" stroke-width="1"/>
+        <!-- heart nose -->
+        <path d="M58 79 Q60 77 62 79 Q63 81 60 83 Q57 81 58 79Z" fill="#f472b6"/>
+        <!-- mouth -->
+        <path d="M53 84 Q60 90 67 84" stroke="#e879f9" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="24" ry="20" fill="url(#hana-body-g)"/>
+        <ellipse cx="60" cy="107" rx="18" ry="16" fill="#fff0f0"/>
+        <!-- tail -->
+        <path d="M84 115 Q96 108 94 120 Q90 128 80 122" fill="#f9a8d4" stroke="#fbc8d8" stroke-width="1"/>
+      </svg>`
+    },
+    nova: {
+      baby: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="nova-b-head" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fff7ed"/>
+            <stop offset="100%" stop-color="#fdba74"/>
+          </radialGradient>
+        </defs>
+        <!-- fox ears -->
+        <path d="M34 52 L26 20 L52 48Z" fill="#fb923c" class="wiggle-part"/>
+        <path d="M86 52 L94 20 L68 48Z" fill="#fb923c" class="wiggle-part"/>
+        <path d="M36 50 L30 26 L50 47Z" fill="#fff7ed"/>
+        <path d="M84 50 L90 26 L70 47Z" fill="#fff7ed"/>
+        <!-- head -->
+        <ellipse cx="60" cy="70" rx="34" ry="32" fill="url(#nova-b-head)"/>
+        <!-- muzzle -->
+        <ellipse cx="60" cy="80" rx="16" ry="10" fill="#fff7ed"/>
+        <!-- eyes -->
+        <ellipse cx="47" cy="67" rx="9" ry="10" fill="white"/>
+        <ellipse cx="73" cy="67" rx="9" ry="10" fill="white"/>
+        <ellipse cx="48" cy="68" rx="6" ry="7" fill="#f59e0b"/>
+        <ellipse cx="74" cy="68" rx="6" ry="7" fill="#f59e0b"/>
+        <ellipse cx="49" cy="69" rx="3" ry="3.5" fill="#451a03"/>
+        <ellipse cx="75" cy="69" rx="3" ry="3.5" fill="#451a03"/>
+        <circle cx="51" cy="65" r="2" fill="white"/>
+        <circle cx="77" cy="65" r="2" fill="white"/>
+        <circle cx="47" cy="72" r="1" fill="white" opacity="0.7"/>
+        <circle cx="73" cy="72" r="1" fill="white" opacity="0.7"/>
+        <!-- blink lids -->
+        <ellipse cx="47" cy="67" rx="9" ry="10" fill="#fdba74" class="eye-lid" opacity="0"/>
+        <ellipse cx="73" cy="67" rx="9" ry="10" fill="#fdba74" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="35" cy="74" rx="8" ry="5" fill="#fb923c" opacity="0.35"/>
+        <ellipse cx="85" cy="74" rx="8" ry="5" fill="#fb923c" opacity="0.35"/>
+        <!-- nose -->
+        <ellipse cx="60" cy="78" rx="4" ry="2.5" fill="#92400e"/>
+        <!-- mouth -->
+        <path d="M54 82 Q60 87 66 82" stroke="#92400e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="22" ry="18" fill="#fb923c"/>
+        <ellipse cx="60" cy="107" rx="15" ry="13" fill="#fff7ed"/>
+      </svg>`,
+      full: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="nova-head-g" cx="38%" cy="32%" r="65%">
+            <stop offset="0%" stop-color="#fff7ed"/>
+            <stop offset="100%" stop-color="#fdba74"/>
+          </radialGradient>
+          <radialGradient id="nova-body-g" cx="40%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#fed7aa"/>
+            <stop offset="100%" stop-color="#fb923c"/>
+          </radialGradient>
+        </defs>
+        <!-- fluffy tail -->
+        <path d="M86 108 Q104 92 106 110 Q108 128 90 126 Q80 124 82 114Z" fill="#fb923c"/>
+        <path d="M90 118 Q100 108 101 118 Q100 124 93 122Z" fill="#fff7ed"/>
+        <!-- fox ears -->
+        <path d="M33 52 L24 18 L54 48Z" fill="#fb923c" class="wiggle-part"/>
+        <path d="M87 52 L96 18 L66 48Z" fill="#fb923c" class="wiggle-part"/>
+        <path d="M35 50 L28 24 L52 48Z" fill="#fff7ed"/>
+        <path d="M85 50 L92 24 L68 48Z" fill="#fff7ed"/>
+        <!-- head -->
+        <ellipse cx="60" cy="68" rx="34" ry="33" fill="url(#nova-head-g)"/>
+        <!-- head highlight -->
+        <ellipse cx="46" cy="54" rx="14" ry="10" fill="white" opacity="0.18"/>
+        <!-- forehead star -->
+        <polygon points="60,48 62,54 68,54 63,58 65,64 60,60 55,64 57,58 52,54 58,54" fill="#fbbf24" opacity="0.9" transform="scale(0.6) translate(40,32)"/>
+        <!-- muzzle -->
+        <ellipse cx="60" cy="78" rx="18" ry="12" fill="#fff7ed"/>
+        <!-- eyes -->
+        <ellipse cx="46" cy="65" rx="10" ry="11" fill="white"/>
+        <ellipse cx="74" cy="65" rx="10" ry="11" fill="white"/>
+        <ellipse cx="47" cy="66" rx="7" ry="8" fill="#f59e0b"/>
+        <ellipse cx="75" cy="66" rx="7" ry="8" fill="#f59e0b"/>
+        <ellipse cx="48" cy="67" rx="4" ry="4.5" fill="#451a03"/>
+        <ellipse cx="76" cy="67" rx="4" ry="4.5" fill="#451a03"/>
+        <circle cx="51" cy="62" r="2.5" fill="white"/>
+        <circle cx="79" cy="62" r="2.5" fill="white"/>
+        <circle cx="46" cy="71" r="1.2" fill="white" opacity="0.75"/>
+        <circle cx="74" cy="71" r="1.2" fill="white" opacity="0.75"/>
+        <!-- blink lids -->
+        <ellipse cx="46" cy="65" rx="10" ry="11" fill="#fdba74" class="eye-lid" opacity="0"/>
+        <ellipse cx="74" cy="65" rx="10" ry="11" fill="#fdba74" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="33" cy="74" rx="9" ry="5.5" fill="#fb923c" opacity="0.38"/>
+        <ellipse cx="87" cy="74" rx="9" ry="5.5" fill="#fb923c" opacity="0.38"/>
+        <!-- nose on muzzle -->
+        <ellipse cx="60" cy="77" rx="4.5" ry="3" fill="#92400e"/>
+        <!-- mouth -->
+        <path d="M53 82 Q60 88 67 82" stroke="#92400e" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="55" cy="118" rx="24" ry="20" fill="url(#nova-body-g)"/>
+        <ellipse cx="55" cy="107" rx="16" ry="14" fill="#fff7ed"/>
+      </svg>`
+    },
+    mochi: {
+      baby: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="mochi-b-head" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#e2e8f0"/>
+          </radialGradient>
+        </defs>
+        <!-- ears -->
+        <circle cx="38" cy="42" r="14" fill="#1f2937"/>
+        <circle cx="82" cy="42" r="14" fill="#1f2937"/>
+        <circle cx="38" cy="42" r="9" fill="white"/>
+        <circle cx="82" cy="42" r="9" fill="white"/>
+        <!-- head -->
+        <ellipse cx="60" cy="72" rx="34" ry="32" fill="url(#mochi-b-head)"/>
+        <!-- eye patches -->
+        <ellipse cx="47" cy="68" rx="12" ry="10" fill="#374151" opacity="0.85" transform="rotate(-8 47 68)"/>
+        <ellipse cx="73" cy="68" rx="12" ry="10" fill="#374151" opacity="0.85" transform="rotate(8 73 68)"/>
+        <!-- eyes -->
+        <ellipse cx="47" cy="68" rx="7" ry="8" fill="white"/>
+        <ellipse cx="73" cy="68" rx="7" ry="8" fill="white"/>
+        <ellipse cx="48" cy="69" rx="5" ry="5.5" fill="#6b3a1f"/>
+        <ellipse cx="74" cy="69" rx="5" ry="5.5" fill="#6b3a1f"/>
+        <ellipse cx="49" cy="70" rx="2.5" ry="3" fill="#111"/>
+        <ellipse cx="75" cy="70" rx="2.5" ry="3" fill="#111"/>
+        <circle cx="51" cy="67" r="1.8" fill="white"/>
+        <circle cx="77" cy="67" r="1.8" fill="white"/>
+        <!-- blink lids -->
+        <ellipse cx="47" cy="68" rx="7" ry="8" fill="#374151" class="eye-lid" opacity="0"/>
+        <ellipse cx="73" cy="68" rx="7" ry="8" fill="#374151" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="35" cy="78" rx="8" ry="5" fill="#fda4af" opacity="0.5"/>
+        <ellipse cx="85" cy="78" rx="8" ry="5" fill="#fda4af" opacity="0.5"/>
+        <!-- nose -->
+        <ellipse cx="60" cy="80" rx="3" ry="2" fill="#374151"/>
+        <!-- mouth -->
+        <path d="M54 84 Q60 90 66 84" stroke="#374151" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="22" ry="18" fill="white"/>
+        <ellipse cx="60" cy="107" rx="16" ry="14" fill="#f8fafc"/>
+        <ellipse cx="44" cy="115" rx="8" ry="10" fill="#1f2937" opacity="0.7"/>
+        <ellipse cx="76" cy="115" rx="8" ry="10" fill="#1f2937" opacity="0.7"/>
+      </svg>`,
+      full: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="mochi-head-g" cx="38%" cy="32%" r="65%">
+            <stop offset="0%" stop-color="#ffffff"/>
+            <stop offset="100%" stop-color="#e2e8f0"/>
+          </radialGradient>
+        </defs>
+        <!-- ears -->
+        <circle cx="37" cy="40" r="16" fill="#1f2937"/>
+        <circle cx="83" cy="40" r="16" fill="#1f2937"/>
+        <circle cx="37" cy="40" r="10" fill="white"/>
+        <circle cx="83" cy="40" r="10" fill="white"/>
+        <!-- green bow -->
+        <path d="M82 26 Q86 22 90 26 Q86 30 82 26Z" fill="#22c55e"/>
+        <path d="M90 26 Q94 22 98 26 Q94 30 90 26Z" fill="#22c55e"/>
+        <circle cx="90" cy="26" r="3" fill="#16a34a"/>
+        <!-- head -->
+        <ellipse cx="60" cy="70" rx="34" ry="33" fill="url(#mochi-head-g)"/>
+        <!-- head highlight -->
+        <ellipse cx="46" cy="56" rx="14" ry="10" fill="white" opacity="0.25"/>
+        <!-- eye patches (panda) -->
+        <ellipse cx="46" cy="67" rx="13" ry="11" fill="#1f2937" opacity="0.8" transform="rotate(-8 46 67)"/>
+        <ellipse cx="74" cy="67" rx="13" ry="11" fill="#1f2937" opacity="0.8" transform="rotate(8 74 67)"/>
+        <!-- eyes inside patches -->
+        <ellipse cx="46" cy="67" rx="8" ry="9" fill="white"/>
+        <ellipse cx="74" cy="67" rx="8" ry="9" fill="white"/>
+        <ellipse cx="47" cy="68" rx="5.5" ry="6.5" fill="#6b3a1f"/>
+        <ellipse cx="75" cy="68" rx="5.5" ry="6.5" fill="#6b3a1f"/>
+        <ellipse cx="48" cy="69" rx="3" ry="3.5" fill="#111"/>
+        <ellipse cx="76" cy="69" rx="3" ry="3.5" fill="#111"/>
+        <circle cx="51" cy="65" r="2.2" fill="white"/>
+        <circle cx="79" cy="65" r="2.2" fill="white"/>
+        <circle cx="46" cy="73" r="1.2" fill="white" opacity="0.7"/>
+        <circle cx="74" cy="73" r="1.2" fill="white" opacity="0.7"/>
+        <!-- blink lids -->
+        <ellipse cx="46" cy="67" rx="8" ry="9" fill="#1f2937" class="eye-lid" opacity="0"/>
+        <ellipse cx="74" cy="67" rx="8" ry="9" fill="#1f2937" class="eye-lid" opacity="0"/>
+        <!-- blush (on white cheek area) -->
+        <ellipse cx="33" cy="78" rx="9" ry="5.5" fill="#fda4af" opacity="0.5"/>
+        <ellipse cx="87" cy="78" rx="9" ry="5.5" fill="#fda4af" opacity="0.5"/>
+        <!-- nose -->
+        <ellipse cx="60" cy="80" rx="3.5" ry="2.2" fill="#374151"/>
+        <!-- mouth -->
+        <path d="M53 84 Q60 91 67 84" stroke="#374151" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="24" ry="20" fill="white"/>
+        <ellipse cx="44" cy="116" rx="10" ry="12" fill="#1f2937" opacity="0.75"/>
+        <ellipse cx="76" cy="116" rx="10" ry="12" fill="#1f2937" opacity="0.75"/>
+        <ellipse cx="60" cy="107" rx="16" ry="14" fill="#f8fafc"/>
+      </svg>`
+    },
+    dra: {
+      baby: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="dra-b-head" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#e0f2fe"/>
+            <stop offset="100%" stop-color="#7dd3fc"/>
+          </radialGradient>
+        </defs>
+        <!-- wings -->
+        <ellipse cx="18" cy="88" rx="12" ry="20" fill="#bae6fd" opacity="0.65" transform="rotate(-20 18 88)"/>
+        <ellipse cx="102" cy="88" rx="12" ry="20" fill="#bae6fd" opacity="0.65" transform="rotate(20 102 88)"/>
+        <!-- horns -->
+        <path d="M48 44 Q46 32 50 28 Q52 34 52 44Z" fill="#fef3c7"/>
+        <path d="M72 44 Q74 32 70 28 Q68 34 68 44Z" fill="#fef3c7"/>
+        <!-- head -->
+        <ellipse cx="60" cy="70" rx="34" ry="32" fill="url(#dra-b-head)"/>
+        <!-- scales on top -->
+        <path d="M38 52 Q42 46 46 52 Q42 50 38 52Z" fill="#7dd3fc" opacity="0.5"/>
+        <path d="M52 46 Q56 40 60 46 Q56 44 52 46Z" fill="#7dd3fc" opacity="0.5"/>
+        <path d="M66 46 Q70 40 74 46 Q70 44 66 46Z" fill="#7dd3fc" opacity="0.5"/>
+        <!-- eyes -->
+        <ellipse cx="47" cy="68" rx="9" ry="10" fill="white"/>
+        <ellipse cx="73" cy="68" rx="9" ry="10" fill="white"/>
+        <ellipse cx="48" cy="69" rx="6" ry="7" fill="#0ea5e9"/>
+        <ellipse cx="74" cy="69" rx="6" ry="7" fill="#0ea5e9"/>
+        <ellipse cx="49" cy="70" rx="3" ry="3.5" fill="#0c4a6e"/>
+        <ellipse cx="75" cy="70" rx="3" ry="3.5" fill="#0c4a6e"/>
+        <circle cx="51" cy="66" r="2" fill="white"/>
+        <circle cx="77" cy="66" r="2" fill="white"/>
+        <!-- blink lids -->
+        <ellipse cx="47" cy="68" rx="9" ry="10" fill="#7dd3fc" class="eye-lid" opacity="0"/>
+        <ellipse cx="73" cy="68" rx="9" ry="10" fill="#7dd3fc" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="35" cy="77" rx="8" ry="5" fill="#67e8f9" opacity="0.45"/>
+        <ellipse cx="85" cy="77" rx="8" ry="5" fill="#67e8f9" opacity="0.45"/>
+        <!-- nostrils -->
+        <circle cx="57" cy="80" r="2" fill="#0c4a6e" opacity="0.6"/>
+        <circle cx="63" cy="80" r="2" fill="#0c4a6e" opacity="0.6"/>
+        <!-- mouth -->
+        <path d="M54 84 Q60 89 66 84" stroke="#0284c7" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="22" ry="18" fill="#bae6fd"/>
+        <ellipse cx="60" cy="107" rx="15" ry="13" fill="#e0f2fe"/>
+        <!-- tail -->
+        <path d="M82 120 Q96 114 92 128 Q86 132 80 124Z" fill="#7dd3fc"/>
+      </svg>`,
+      full: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="dra-head-g" cx="38%" cy="32%" r="65%">
+            <stop offset="0%" stop-color="#e0f2fe"/>
+            <stop offset="100%" stop-color="#7dd3fc"/>
+          </radialGradient>
+          <radialGradient id="dra-body-g" cx="40%" cy="30%" r="65%">
+            <stop offset="0%" stop-color="#bae6fd"/>
+            <stop offset="100%" stop-color="#38bdf8"/>
+          </radialGradient>
+        </defs>
+        <!-- wings -->
+        <ellipse cx="14" cy="86" rx="14" ry="26" fill="#bae6fd" opacity="0.6" transform="rotate(-25 14 86)"/>
+        <ellipse cx="106" cy="86" rx="14" ry="26" fill="#bae6fd" opacity="0.6" transform="rotate(25 106 86)"/>
+        <!-- tail -->
+        <path d="M84 118 Q100 110 98 126 Q92 134 82 126Z" fill="#38bdf8"/>
+        <!-- horns -->
+        <path d="M46 46 Q43 30 48 25 Q50 32 52 46Z" fill="#fef3c7" stroke="#fde68a" stroke-width="0.5"/>
+        <path d="M74 46 Q77 30 72 25 Q70 32 68 46Z" fill="#fef3c7" stroke="#fde68a" stroke-width="0.5"/>
+        <!-- spines between horns -->
+        <path d="M54 44 L56 38 L58 44Z" fill="#7dd3fc" opacity="0.8"/>
+        <path d="M59 43 L61 36 L63 43Z" fill="#7dd3fc" opacity="0.8"/>
+        <path d="M64 44 L66 38 L68 44Z" fill="#7dd3fc" opacity="0.8"/>
+        <!-- head -->
+        <ellipse cx="60" cy="68" rx="34" ry="33" fill="url(#dra-head-g)"/>
+        <!-- head highlight -->
+        <ellipse cx="46" cy="54" rx="14" ry="10" fill="white" opacity="0.2"/>
+        <!-- scale pattern on head top -->
+        <path d="M36 54 Q40 48 44 54 Q40 52 36 54Z" fill="#38bdf8" opacity="0.4"/>
+        <path d="M50 48 Q54 42 58 48 Q54 46 50 48Z" fill="#38bdf8" opacity="0.4"/>
+        <path d="M64 48 Q68 42 72 48 Q68 46 64 48Z" fill="#38bdf8" opacity="0.4"/>
+        <path d="M76 54 Q80 48 84 54 Q80 52 76 54Z" fill="#38bdf8" opacity="0.4"/>
+        <!-- eyes -->
+        <ellipse cx="46" cy="67" rx="10" ry="11" fill="white"/>
+        <ellipse cx="74" cy="67" rx="10" ry="11" fill="white"/>
+        <ellipse cx="47" cy="68" rx="7" ry="8" fill="#0ea5e9"/>
+        <ellipse cx="75" cy="68" rx="7" ry="8" fill="#0ea5e9"/>
+        <ellipse cx="48" cy="69" rx="4" ry="4.5" fill="#0c4a6e"/>
+        <ellipse cx="76" cy="69" rx="4" ry="4.5" fill="#0c4a6e"/>
+        <circle cx="51" cy="64" r="2.5" fill="white"/>
+        <circle cx="79" cy="64" r="2.5" fill="white"/>
+        <circle cx="46" cy="73" r="1.2" fill="white" opacity="0.8"/>
+        <circle cx="74" cy="73" r="1.2" fill="white" opacity="0.8"/>
+        <!-- blink lids -->
+        <ellipse cx="46" cy="67" rx="10" ry="11" fill="#7dd3fc" class="eye-lid" opacity="0"/>
+        <ellipse cx="74" cy="67" rx="10" ry="11" fill="#7dd3fc" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="33" cy="76" rx="9" ry="5.5" fill="#67e8f9" opacity="0.45"/>
+        <ellipse cx="87" cy="76" rx="9" ry="5.5" fill="#67e8f9" opacity="0.45"/>
+        <!-- nostrils -->
+        <circle cx="57" cy="79" r="2.2" fill="#0c4a6e" opacity="0.55"/>
+        <circle cx="63" cy="79" r="2.2" fill="#0c4a6e" opacity="0.55"/>
+        <!-- mouth -->
+        <path d="M53 83 Q60 89 67 83" stroke="#0284c7" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- body -->
+        <ellipse cx="60" cy="118" rx="24" ry="20" fill="url(#dra-body-g)"/>
+        <ellipse cx="60" cy="107" rx="17" ry="15" fill="#e0f2fe"/>
+      </svg>`
+    },
+    fae: {
+      baby: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="fae-b-head" cx="40%" cy="35%" r="65%">
+            <stop offset="0%" stop-color="#fef9f0"/>
+            <stop offset="100%" stop-color="#fcd9b0"/>
+          </radialGradient>
+        </defs>
+        <!-- wings -->
+        <ellipse cx="16" cy="90" rx="13" ry="22" fill="#99f6e4" opacity="0.55" transform="rotate(-30 16 90)"/>
+        <ellipse cx="104" cy="90" rx="13" ry="22" fill="#99f6e4" opacity="0.55" transform="rotate(30 104 90)"/>
+        <!-- teal hair -->
+        <ellipse cx="60" cy="52" rx="32" ry="22" fill="#5eead4"/>
+        <ellipse cx="28" cy="70" rx="12" ry="24" fill="#5eead4" transform="rotate(10 28 70)"/>
+        <ellipse cx="92" cy="70" rx="12" ry="24" fill="#5eead4" transform="rotate(-10 92 70)"/>
+        <!-- pointed ears -->
+        <path d="M26 66 L18 58 L28 62Z" fill="#fcd9b0"/>
+        <path d="M94 66 L102 58 L92 62Z" fill="#fcd9b0"/>
+        <!-- head -->
+        <ellipse cx="60" cy="72" rx="32" ry="30" fill="url(#fae-b-head)"/>
+        <!-- eyes -->
+        <ellipse cx="47" cy="69" rx="9" ry="10" fill="white"/>
+        <ellipse cx="73" cy="69" rx="9" ry="10" fill="white"/>
+        <ellipse cx="48" cy="70" rx="6" ry="7" fill="#14b8a6"/>
+        <ellipse cx="74" cy="70" rx="6" ry="7" fill="#14b8a6"/>
+        <ellipse cx="49" cy="71" rx="3" ry="3.5" fill="#134e4a"/>
+        <ellipse cx="75" cy="71" rx="3" ry="3.5" fill="#134e4a"/>
+        <circle cx="51" cy="67" r="2" fill="white"/>
+        <circle cx="77" cy="67" r="2" fill="white"/>
+        <!-- blink lids -->
+        <ellipse cx="47" cy="69" rx="9" ry="10" fill="#5eead4" class="eye-lid" opacity="0"/>
+        <ellipse cx="73" cy="69" rx="9" ry="10" fill="#5eead4" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="35" cy="78" rx="8" ry="5" fill="#fdba74" opacity="0.4"/>
+        <ellipse cx="85" cy="78" rx="8" ry="5" fill="#fdba74" opacity="0.4"/>
+        <!-- nose -->
+        <ellipse cx="60" cy="79" rx="2" ry="1.5" fill="#d97706" opacity="0.6"/>
+        <!-- mouth -->
+        <path d="M54 83 Q60 88 66 83" stroke="#0d9488" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+        <!-- body/dress -->
+        <ellipse cx="60" cy="118" rx="22" ry="18" fill="#99f6e4"/>
+        <ellipse cx="60" cy="107" rx="15" ry="13" fill="#ccfbf1"/>
+        <!-- sparkles -->
+        <text x="18" y="52" font-size="10" opacity="0.7">✦</text>
+        <text x="94" y="56" font-size="8" opacity="0.6">✦</text>
+      </svg>`,
+      full: `<svg viewBox="0 0 120 140" xmlns="http://www.w3.org/2000/svg" width="120" height="140">
+        <defs>
+          <radialGradient id="fae-head-g" cx="38%" cy="32%" r="65%">
+            <stop offset="0%" stop-color="#fef9f0"/>
+            <stop offset="100%" stop-color="#fcd9b0"/>
+          </radialGradient>
+          <radialGradient id="fae-wing-l" cx="60%" cy="40%" r="65%">
+            <stop offset="0%" stop-color="#ccfbf1"/>
+            <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.7"/>
+          </radialGradient>
+          <radialGradient id="fae-wing-r" cx="40%" cy="40%" r="65%">
+            <stop offset="0%" stop-color="#ccfbf1"/>
+            <stop offset="100%" stop-color="#14b8a6" stop-opacity="0.7"/>
+          </radialGradient>
+          <radialGradient id="fae-dress-g" cx="50%" cy="20%" r="80%">
+            <stop offset="0%" stop-color="#ccfbf1"/>
+            <stop offset="100%" stop-color="#99f6e4"/>
+          </radialGradient>
+        </defs>
+        <!-- butterfly wings -->
+        <path d="M30 92 Q6 72 8 96 Q10 116 30 108Z" fill="url(#fae-wing-l)" opacity="0.75"/>
+        <path d="M26 108 Q10 116 14 128 Q22 132 32 120Z" fill="url(#fae-wing-l)" opacity="0.6"/>
+        <path d="M90 92 Q114 72 112 96 Q110 116 90 108Z" fill="url(#fae-wing-r)" opacity="0.75"/>
+        <path d="M94 108 Q110 116 106 128 Q98 132 88 120Z" fill="url(#fae-wing-r)" opacity="0.6"/>
+        <!-- teal hair flowing -->
+        <ellipse cx="60" cy="48" rx="34" ry="22" fill="#2dd4bf"/>
+        <ellipse cx="26" cy="68" rx="14" ry="28" fill="#2dd4bf" transform="rotate(12 26 68)"/>
+        <ellipse cx="94" cy="68" rx="14" ry="28" fill="#2dd4bf" transform="rotate(-12 94 68)"/>
+        <!-- hair highlight -->
+        <ellipse cx="48" cy="42" rx="12" ry="8" fill="#5eead4" opacity="0.6"/>
+        <!-- flower in hair -->
+        <circle cx="84" cy="36" r="5" fill="#fda4af"/>
+        <circle cx="79" cy="32" r="4" fill="#fda4af"/>
+        <circle cx="89" cy="32" r="4" fill="#fda4af"/>
+        <circle cx="84" cy="28" r="4" fill="#fda4af"/>
+        <circle cx="84" cy="36" r="3" fill="#fbbf24"/>
+        <!-- pointed ears -->
+        <path d="M26 64 L16 54 L28 60Z" fill="#fcd9b0"/>
+        <path d="M94 64 L104 54 L92 60Z" fill="#fcd9b0"/>
+        <!-- head -->
+        <ellipse cx="60" cy="70" rx="32" ry="31" fill="url(#fae-head-g)"/>
+        <!-- head highlight -->
+        <ellipse cx="46" cy="57" rx="13" ry="9" fill="white" opacity="0.2"/>
+        <!-- eyes -->
+        <ellipse cx="46" cy="68" rx="10" ry="11" fill="white"/>
+        <ellipse cx="74" cy="68" rx="10" ry="11" fill="white"/>
+        <ellipse cx="47" cy="69" rx="7" ry="8" fill="#14b8a6"/>
+        <ellipse cx="75" cy="69" rx="7" ry="8" fill="#14b8a6"/>
+        <ellipse cx="48" cy="70" rx="4" ry="4.5" fill="#134e4a"/>
+        <ellipse cx="76" cy="70" rx="4" ry="4.5" fill="#134e4a"/>
+        <!-- star highlight in eyes -->
+        <path d="M51 64 L52 66 L54 66 L52 67.5 L53 70 L51 68.5 L49 70 L50 67.5 L48 66 L50 66Z" fill="white" opacity="0.9" transform="scale(0.5) translate(52,62)"/>
+        <circle cx="51" cy="65" r="2.2" fill="white"/>
+        <circle cx="79" cy="65" r="2.2" fill="white"/>
+        <circle cx="46" cy="74" r="1.2" fill="white" opacity="0.75"/>
+        <circle cx="74" cy="74" r="1.2" fill="white" opacity="0.75"/>
+        <!-- sparkle dots in eyes -->
+        <circle cx="53" cy="71" r="0.8" fill="white" opacity="0.8"/>
+        <circle cx="81" cy="71" r="0.8" fill="white" opacity="0.8"/>
+        <!-- blink lids -->
+        <ellipse cx="46" cy="68" rx="10" ry="11" fill="#5eead4" class="eye-lid" opacity="0"/>
+        <ellipse cx="74" cy="68" rx="10" ry="11" fill="#5eead4" class="eye-lid" opacity="0"/>
+        <!-- blush -->
+        <ellipse cx="33" cy="77" rx="9" ry="5.5" fill="#fdba74" opacity="0.4"/>
+        <ellipse cx="87" cy="77" rx="9" ry="5.5" fill="#fdba74" opacity="0.4"/>
+        <!-- nose -->
+        <ellipse cx="60" cy="78" rx="2.2" ry="1.5" fill="#d97706" opacity="0.6"/>
+        <!-- mouth -->
+        <path d="M53 82 Q60 88 67 82" stroke="#0d9488" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+        <!-- body dress -->
+        <ellipse cx="60" cy="118" rx="24" ry="20" fill="url(#fae-dress-g)"/>
+        <ellipse cx="60" cy="107" rx="16" ry="14" fill="#ccfbf1"/>
+        <!-- floating sparkles -->
+        <text x="12" y="46" font-size="11" opacity="0.65">✦</text>
+        <text x="98" y="50" font-size="9" opacity="0.6">✦</text>
+        <text x="8" y="68" font-size="8" opacity="0.5">✦</text>
+        <text x="104" y="70" font-size="10" opacity="0.55">✦</text>
+      </svg>`
+    }
+  };
+
+  // Stage 0 = egg
+  if (stage === 0) {
+    return svgs.egg[petId] || svgs.egg.luna;
+  }
+  // Stages 1-2 = baby
+  if (stage <= 1) {
+    return (svgs[petId] && svgs[petId].baby) || svgs[petId].full;
+  }
+  // Stages 2-5 = full
+  return (svgs[petId] && svgs[petId].full) || svgs[petId].full;
+}
+
+function getPetStageIndex(xp) {
+  const stages = [{minXP:0},{minXP:150},{minXP:400},{minXP:900},{minXP:2000}];
+  let si = 0;
+  for (let i = stages.length-1; i >= 0; i--) {
+    if (xp >= stages[i].minXP) { si = i; break; }
+  }
+  return si;
+}
+
+function getSelectedPetId() {
+  return localStorage.getItem('selected_pet') || 'luna';
+}
+function getPetAffection() {
+  return parseInt(localStorage.getItem('pet_affection') || '0');
+}
+function setPetAffection(n) {
+  localStorage.setItem('pet_affection', String(n));
+}
+
+function getPetCurrentStage(petId) {
+  const st = calcStats();
+  const pet = PETS[petId];
+  const si = getPetStageIndex(st.tx);
+  return {pet, stage: pet.stages[si], si, xp: st.tx};
+}
+
+function renderTodayPetCard() {
+  const petId = getSelectedPetId();
+  const {pet, stage, si, xp} = getPetCurrentStage(petId);
+  const aff = getPetAffection();
+  const nextStage = pet.stages[si+1];
+  const prevXP = pet.stages[si].minXP;
+  const nextXP = nextStage ? nextStage.minXP : xp;
+  const pct = nextStage ? Math.min(100, Math.round((xp - prevXP) / (nextXP - prevXP) * 100)) : 100;
+  const isLegend = si >= 4;
+  const showOrbit = si >= 2;
+
+  let orbitHtml = '';
+  if (showOrbit) {
+    orbitHtml = '<div class="pet-orbit"><span class="pet-orbit-star">✨</span><span class="pet-orbit-star">⭐</span><span class="pet-orbit-star">💫</span></div>';
+  }
+
+  const card = document.getElementById('today-pet-card');
+  if (!card) return;
+  card.innerHTML = `
+    <div class="pet-card" style="background:${pet.theme.bg}">
+      <div class="pet-card-inner">
+        <div class="pet-stage-wrap ${isLegend ? 'pet-legend' : ''}">
+          ${orbitHtml}
+          <div style="width:110px;height:110px;border-radius:50%;background:rgba(255,255,255,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(0,0,0,0.12);position:relative;z-index:1">
+          <svg class="pet-svg-wrap" id="pet-emoji-today" onclick="tapPet(event,'today')" width="96" height="110" viewBox="0 0 120 140" style="display:block">${getPetSVG(petId, si)}</svg>
+          </div>
+          <div id="pet-speech-today" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:white;border-radius:16px;padding:10px 14px;font-size:12px;font-weight:600;color:#3f3f46;white-space:normal;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:20;animation:speechIn .25s ease-out;pointer-events:none;max-width:160px;text-align:center;min-width:100px"></div>
+        </div>
+        <div class="pet-info">
+          <div class="pet-name" style="color:${pet.theme.text}">${pet.name}</div>
+          <div class="pet-stage-title" style="color:${pet.theme.accent}">${stage.title} · 阶段${si+1}</div>
+          <div class="pet-xp-label">成长进度</div>
+          <div class="pet-xp-track"><div class="pet-xp-fill" style="width:${pct}%;background:linear-gradient(90deg,${pet.theme.accent},${pet.theme.glow})"></div></div>
+          <div class="pet-xp-txt" style="color:${pet.theme.accent}">${nextStage ? xp-prevXP+'/'+(nextXP-prevXP)+' XP' : '已满级！'}</div>
+          <div class="pet-affection" style="color:${pet.theme.accent}">💕 互动 ${aff} 次</div>
+          <button class="pet-change-btn" style="color:${pet.theme.text}" onclick="openPetModal()">换宠物 ✦</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+let petSpeechTimer = null;
+function tapPet(e, location) {
+  const petId = getSelectedPetId();
+  const pet = PETS[petId];
+  const aff = getPetAffection() + 1;
+  setPetAffection(aff);
+
+  // heart particles
+  const x = e ? e.clientX : window.innerWidth/2;
+  const y = e ? e.clientY : window.innerHeight/2;
+  for (let i = 0; i < 4; i++) {
+    setTimeout(() => {
+      const h = document.createElement('div');
+      h.className = 'pet-heart';
+      h.textContent = '💕';
+      h.style.cssText = 'left:' + (x + (Math.random()-0.5)*50) + 'px;top:' + (y-20) + 'px';
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), 900);
+    }, i * 80);
+  }
+
+  // happy animation
+  const emojiEl = document.getElementById('pet-emoji-' + location);
+  if (emojiEl) {
+    emojiEl.classList.remove('pet-happy');
+    void emojiEl.offsetWidth;
+    emojiEl.classList.add('pet-happy');
+    setTimeout(() => emojiEl.classList.remove('pet-happy'), 700);
+  }
+
+  // speech bubble
+  const msg = pet.taps[Math.floor(Math.random() * pet.taps.length)];
+  const bubbleId = 'pet-speech-' + location;
+  const bubble = document.getElementById(bubbleId);
+  if (bubble) {
+    bubble.textContent = msg;
+    bubble.style.display = 'block';
+    if (petSpeechTimer) clearTimeout(petSpeechTimer);
+    petSpeechTimer = setTimeout(() => {
+      if (bubble) bubble.style.display = 'none';
+    }, 2500);
+  }
+
+  // update affection display
+  renderTodayPetCard();
+}
+
+function openPetModal() {
+  const st = calcStats();
+  const selectedId = getSelectedPetId();
+  const grid = document.getElementById('pet-grid');
+  if (!grid) return;
+  grid.innerHTML = Object.values(PETS).map(pet => {
+    const si = getPetStageIndex(st.tx);
+    const stage = pet.stages[si];
+    const isSel = pet.id === selectedId;
+    return `<div class="pet-opt ${isSel ? 'selected' : ''}" onclick="selectPet('${pet.id}')">
+      <span class="pet-opt-em" style="display:block;line-height:1;overflow:hidden;transform-origin:top left">${getPetSVG(pet.id, si)}</span>
+      <div class="pet-opt-name">${pet.shortName}</div>
+      <div class="pet-opt-stage">${stage.title}</div>
+    </div>`;
+  }).join('');
+  document.getElementById('pet-modal-bg').classList.add('show');
+}
+
+function closePetModal() {
+  document.getElementById('pet-modal-bg').classList.remove('show');
+}
+
+function selectPet(petId) {
+  localStorage.setItem('selected_pet', petId);
+  closePetModal();
+  renderTodayPetCard();
+  renderPetPage();
+  toast('已选择 ' + PETS[petId].name + ' ✨');
+}
+
+function renderPetPage() {
+  const petId = getSelectedPetId();
+  const {pet, stage, si, xp} = getPetCurrentStage(petId);
+  const aff = getPetAffection();
+  const isLegend = si >= 4;
+  const showOrbit = si >= 2;
+
+  let orbitHtml = '';
+  if (showOrbit) {
+    orbitHtml = '<div class="pet-orbit" style="width:140px;height:163px;position:absolute;top:0;left:0"><span class="pet-orbit-star" style="font-size:16px">✨</span><span class="pet-orbit-star" style="font-size:16px">⭐</span><span class="pet-orbit-star" style="font-size:16px">💫</span></div>';
+  }
+
+  const stagesHtml = pet.stages.map((s, i) => {
+    const unlocked = xp >= s.minXP;
+    const isCurrent = i === si;
+    return `<div class="pet-stage-item">
+      <div class="pet-stage-dot ${unlocked ? 'unlocked' : 'locked'}">${unlocked ? s.emoji : '🔒'}</div>
+      <div class="pet-stage-info">
+        <div class="pet-stage-name ${unlocked ? '' : 'locked'}">${s.title}${isCurrent ? ' ← 当前' : ''}</div>
+        <div class="pet-stage-desc">${s.desc}</div>
+      </div>
+      <span class="pet-stage-xp">${s.minXP} XP</span>
+    </div>`;
+  }).join('');
+
+  const nextStage = pet.stages[si+1];
+  const prevXP = pet.stages[si].minXP;
+  const nextXP = nextStage ? nextStage.minXP : xp;
+  const pct = nextStage ? Math.min(100, Math.round((xp - prevXP) / (nextXP - prevXP) * 100)) : 100;
+
+  const container = document.getElementById('pet-page-content');
+  if (!container) return;
+  container.innerHTML = `
+    <div class="pet-page-hero" style="background:${pet.theme.bg}">
+      <div class="pet-big-wrap ${isLegend ? 'pet-legend' : ''}">
+        ${orbitHtml}
+        <div style="width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.92);display:flex;align-items:center;justify-content:center;box-shadow:0 6px 28px rgba(0,0,0,0.14);position:relative;z-index:1;margin:0 auto 8px">
+        <svg class="pet-svg-wrap" id="pet-emoji-pet" onclick="tapPet(event,'pet')" width="140" height="163" viewBox="0 0 120 140" style="display:block">${getPetSVG(petId, si)}</svg>
+        </div>
+        <div id="pet-speech-pet" style="display:none;position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);background:white;border-radius:16px;padding:10px 14px;font-size:12px;font-weight:600;color:#3f3f46;white-space:normal;box-shadow:0 4px 20px rgba(0,0,0,.15);z-index:20;pointer-events:none;max-width:160px;text-align:center;min-width:100px"></div>
+      </div>
+      <div style="color:${pet.theme.text};font-size:22px;font-weight:800;margin-bottom:4px">${pet.name}</div>
+      <div style="color:${pet.theme.accent};font-size:13px;font-weight:700;margin-bottom:4px">${stage.title} · 阶段${si+1}/5</div>
+      <div style="color:${pet.theme.text};font-size:12px;opacity:.7;margin-bottom:16px">${stage.desc}</div>
+      <div style="background:rgba(255,255,255,.4);border-radius:10px;height:8px;margin:0 20px;overflow:hidden;margin-bottom:6px">
+        <div style="height:100%;width:${pct}%;background:linear-gradient(90deg,${pet.theme.accent},${pet.theme.glow});border-radius:10px;transition:width .8s"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:11px;color:${pet.theme.accent};margin:0 20px 12px">
+        <span>${nextStage ? (xp-prevXP)+'/'+(nextXP-prevXP)+' XP' : '已达最高阶段'}</span>
+        <span>💕 已互动${aff}次</span>
+      </div>
+      <button class="pet-change-btn" style="max-width:200px;margin:0 auto;color:${pet.theme.text}" onclick="openPetModal()">换宠物 ✦</button>
+    </div>
+    <div class="wrap" style="padding-top:14px">
+      <div class="sec-lbl">成长阶段</div>
+      <div class="icard" style="padding:0 16px">
+        <div class="pet-stage-timeline">${stagesHtml}</div>
+      </div>
+      <div style="height:10px"></div>
+    </div>`;
+}
+
+// ─── CORE FUNCTIONS ───
+function calcStats(){
+  const h=JSON.parse(localStorage.getItem('history')||'{}'),ks=Object.keys(h).sort();
+  const tt=ks.reduce((s,k)=>s+(h[k].done||0),0);
+  const tx=ks.reduce((s,k)=>{const d=h[k].done||0,t=h[k].total||12;return s+d*XPT+(d>=t?XPB:0);},0);
+  const pd=ks.filter(k=>(h[k].done||0)>=(h[k].total||12)).length;
+  let streak=0;for(let i=0;;i++){const d=new Date();d.setDate(d.getDate()-i);const k=d.toISOString().split('T')[0];if(h[k]&&h[k].done>0)streak++;else break;}
+  let ms=0,c=0;ks.forEach(k=>{if(h[k]&&h[k].done>0){c++;ms=Math.max(ms,c);}else c=0;});
+  return{tt,tx,pd,streak,ms};
+}
+function lvOf(xp){
+  let li=0;for(let i=LEVELS.length-1;i>=0;i--){if(xp>=LEVELS[i].xp){li=i;break;}}
+  const lv=LEVELS[li],nx=LEVELS[li+1],inL=xp-lv.xp,need=nx?nx.xp-lv.xp:1,pct=nx?Math.min(100,~~(inL/need*100)):100;
+  return{li,lv,nx,inL,need,pct};
+}
+function dk(){return new Date().toISOString().split('T')[0];}
+function ds(){const r=localStorage.getItem('day_'+dk());return r?JSON.parse(r):{};}
+function saveDS(s){
+  const k=dk();localStorage.setItem('day_'+k,JSON.stringify(s));
+  const done=Object.values(s).filter(Boolean).length;
+  const h=JSON.parse(localStorage.getItem('history')||'{}');
+  h[k]={done,total:TASKS.length};localStorage.setItem('history',JSON.stringify(h));
+}
+
+let pxp=0;
+function toggleTask(id,e){
+  const s=ds(),was=!s[id];s[id]=!s[id];saveDS(s);
+  const st=calcStats();
+  if(was){
+    spawnP(e);spawnXP(e,'+'+XPT);
+    const ol=lvOf(pxp).li,nl=lvOf(st.tx).li;
+    if(nl>ol)setTimeout(()=>showLU(LEVELS[nl]),600);
+    const done=Object.values(s).filter(Boolean).length;
+    if(done===TASKS.length){setTimeout(()=>{confetti();toast('🎉 完美！+'+XPB+' 额外XP！');},400);}
+    else toast('✅ +'+XPT+' XP');
+  }
+  pxp=st.tx;
+  renderTasks();updateRing();updateXPBar();renderTodayPetCard();
+}
+function toggleOpen(id){
+  const el=document.getElementById('tr-'+id);
+  el&&el.classList.toggle('open');
+}
+
+function spawnP(e){
+  const x=e?e.clientX:innerWidth/2,y=e?e.clientY:innerHeight/2;
+  ['⭐','✨','💫','🌟','💥'].forEach((em,i)=>{
+    const p=document.createElement('div');p.className='particle';p.textContent=em;
+    p.style.cssText='left:'+(x+(Math.random()-.5)*70)+'px;top:'+(y-10)+'px;font-size:'+(14+~~(Math.random()*10))+'px;animation-delay:'+(i*.06)+'s';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1000);
+  });
+}
+function spawnXP(e,t){
+  const x=e?e.clientX:innerWidth/2,y=e?e.clientY:innerHeight/2;
+  const el=document.createElement('div');el.className='xpop';el.textContent=t+' XP';
+  el.style.cssText='left:'+(x-20)+'px;top:'+(y-30)+'px';
+  document.body.appendChild(el);setTimeout(()=>el.remove(),1100);
+}
+function confetti(){
+  const em=['🎉','🎊','⭐','🌟','💫','✨','🎈','💎','👑'];
+  for(let i=0;i<20;i++)setTimeout(()=>{
+    const p=document.createElement('div');p.className='particle';p.textContent=em[~~(Math.random()*em.length)];
+    p.style.cssText='left:'+Math.random()*innerWidth+'px;top:'+Math.random()*innerHeight*.7+'px;font-size:'+(14+~~(Math.random()*14))+'px';
+    document.body.appendChild(p);setTimeout(()=>p.remove(),1000);
+  },i*55);
+}
+function showLU(lv){document.getElementById('lu-em').textContent=lv.icon;document.getElementById('lu-nm').textContent=lv.name;document.getElementById('lu-bg').classList.add('show');confetti();}
+function closeLU(){document.getElementById('lu-bg').classList.remove('show');}
+
+function updateRing(){
+  const s=ds(),done=Object.values(s).filter(Boolean).length,pct=done/TASKS.length;
+  const circ=490,off=circ*(1-pct);
+  document.getElementById('rprog').style.strokeDashoffset=off;
+  document.getElementById('ring-n').textContent=done;
+  const msgs=['今天还没开始，起来打卡吧 💪','好的开始！保持节奏 🌱','完成'+done+'项，状态不错！','过半了！今天你很棒 ✨','最后几步了，冲！🎯','🎉 全部完成！你今天太厉害了！'];
+  const ni=done===0?0:done<=2?1:done<=5?2:done<=8?3:done<TASKS.length?4:5;
+  document.getElementById('status-txt').textContent=msgs[ni];
+}
+function updateXPBar(){
+  const st=calcStats(),{li,lv,nx,inL,need,pct}=lvOf(st.tx);
+  document.getElementById('h-lv').textContent='Lv.'+(li+1)+' '+lv.name+' '+lv.icon;
+  document.getElementById('h-st').textContent='🔥 '+st.streak+'天';
+  document.getElementById('xpprog').style.width=pct+'%';
+  document.getElementById('xptxt').textContent=nx?inL+'/'+need+' XP':st.tx+' XP';
+  pxp=st.tx;
+}
+
+function renderDailyRec(){
+  const dy=~~((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000);
+  const idx=(dy-1+DAILY_REC.length)%DAILY_REC.length,r=DAILY_REC[idx];
+  document.getElementById('daily-rec').innerHTML='<div class="rec-card"><div class="rec-top"><span class="rec-title">🌟 今日推荐</span><span class="rec-badge">第'+(idx+1)+'/'+DAILY_REC.length+'天</span></div><div class="rec-list"><div class="rec-item"><span class="rec-icon">🥐</span><span class="rec-tag">早餐</span><span class="rec-content">'+r.breakfast+'</span></div><div class="rec-item"><span class="rec-icon">🥗</span><span class="rec-tag">午餐</span><span class="rec-content">'+r.lunch+'</span></div><div class="rec-item"><span class="rec-icon">🍜</span><span class="rec-tag">晚餐</span><span class="rec-content">'+r.dinner+'</span></div><div class="rec-item"><span class="rec-icon">🌿</span><span class="rec-tag">贴士</span><span class="rec-content">'+r.tip+'</span></div><div class="rec-item"><span class="rec-icon">💪</span><span class="rec-tag">运动</span><span class="rec-content">'+r.exercise+'</span></div></div></div>';
+}
+
+function renderTasks(){
+  const s=ds(),c=document.getElementById('task-list');
+  const groups={};
+  TASKS.forEach(t=>{if(!groups[t.sec])groups[t.sec]=[];groups[t.sec].push(t);});
+  let html='';
+  Object.entries(groups).forEach(([sec,tasks])=>{
+    html+='<div class="task-group"><div class="group-header"><span class="group-name">'+sec+'</span></div>';
+    tasks.forEach(t=>{
+      const done=!!s[t.id],openCls=document.getElementById('tr-'+t.id)&&document.getElementById('tr-'+t.id).classList.contains('open')?'open':'';
+      html+='<div class="task-row '+(done?'done':'')+' '+openCls+'" id="tr-'+t.id+'" onclick="toggleOpen(\''+t.id+'\')">'
+        +'<div class="t-ico-wrap '+t.icoBg+'">'+t.icon+'</div>'
+        +'<div class="t-info"><div class="t-name">'+t.title+'</div>'
+        +'<div class="t-meta"><span class="t-time">'+t.time+'</span><span class="t-xp">'+(done?'✅':'')+' +10 XP</span></div></div>'
+        +'<span class="t-expand">▼</span>'
+        +'<div class="t-check" onclick="event.stopPropagation();toggleTask(\''+t.id+'\',event)">'+(done?'✓':'')+'</div>'
+        +'</div><div class="t-body"><div class="t-body-inner">'+t.desc+'</div></div>';
+    });
+    html+='</div>';
+  });
+  c.innerHTML=html;
+}
+
+function renderTip(){
+  const dy=~~((Date.now()-new Date(new Date().getFullYear(),0,0))/86400000),tip=TIPS[dy%TIPS.length];
+  document.getElementById('daily-tip').innerHTML='<div class="tip-head">'+tip.title+'</div><div class="tip-body">'+tip.content+'</div>';
+}
+function renderHeader(){
+  const n=new Date(),days=['日','一','二','三','四','五','六'];
+  document.getElementById('h-date').textContent=(n.getFullYear()+'年'+(n.getMonth()+1)+'月'+n.getDate()+'日 · 周'+days[n.getDay()]).toUpperCase();
+  const h=n.getHours();
+  const g={early:'还没睡？睡眠不足会让你更馋 🌙',morning:'早安！先称重再吃高蛋白早餐 ☀️',lunch:'上午好！午饭先吃菜和蛋白质 🥗',afternoon:'下午好！记得起来动一动 💧',evening:'该训练啦，动起来更轻松 🏃',night:'晚上好！睡够7小时帮你掉秤 🌙'};
+  const k=h<6?'early':h<10?'morning':h<14?'lunch':h<18?'afternoon':h<21?'evening':'night';
+  document.getElementById('h-greet').textContent=g[k];
+}
+
+function renderStats(){
+  const st=calcStats(),{li,lv,nx,inL,need,pct}=lvOf(st.tx);
+  document.getElementById('s-ico').textContent=lv.icon;
+  document.getElementById('s-nm').textContent=lv.name;
+  document.getElementById('s-num').textContent='Lv.'+(li+1);
+  document.getElementById('s-next').textContent=nx?'距「'+nx.name+'」还需 '+(need-inL)+' XP':'已达最高等级 🏆';
+  document.getElementById('s-fill').style.width=pct+'%';
+  document.getElementById('s-xlbl').textContent=inL+' XP';
+  document.getElementById('s-xmax').textContent='/ '+(nx?need:st.tx)+' XP';
+  document.getElementById('s-streak').textContent=st.streak;
+  document.getElementById('s-txp').textContent=st.tx;
+  document.getElementById('s-tasks').textContent=st.tt;
+  document.getElementById('s-perf').textContent=st.pd;
+  document.getElementById('bg-grid').innerHTML=BADGES.map(b=>{
+    const u=b.c(st);
+    return '<div class="bg-item '+(u?'unlocked':'locked')+'"><div class="bg-em">'+(u?b.icon:'🔒')+'</div><div class="bg-name">'+b.name+'</div><div class="bg-desc">'+b.desc+'</div></div>';
+  }).join('');
+  const h=JSON.parse(localStorage.getItem('history')||'{}'),td=dk(),dn=['日','一','二','三','四','五','六'];
+  let wh='';
+  for(let i=6;i>=0;i--){
+    const d=new Date();d.setDate(d.getDate()-i);const k=d.toISOString().split('T')[0],data=h[k],p2=data?~~(data.done/data.total*100):0,it=k===td;
+    wh+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:5px">'
+      +'<div style="font-size:10px;color:'+(p2>0?'#8b2fc9':'#d4d4d8')+';font-weight:700">'+(p2>0?p2+'%':'—')+'</div>'
+      +'<div style="width:100%;height:54px;background:#f4f0ff;border-radius:8px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end">'
+      +'<div style="height:'+p2+'%;background:linear-gradient(0deg,#8b2fc9,#c026d3);transition:height .6s;border-radius:8px"></div></div>'
+      +'<div style="font-size:11px;color:'+(it?'#8b2fc9':'#a1a1aa')+';font-weight:'+(it?800:500)+'">周'+dn[d.getDay()]+'</div></div>';
+  }
+  document.getElementById('week-bars').innerHTML=wh;
+}
+function renderNotifSch(){
+  document.getElementById('topic-input').value=localStorage.getItem('ntfy_topic')||'';
+  document.getElementById('notif-sch').innerHTML=NOTIFS.map(n=>'<div class="nrow"><span style="font-size:10px;font-weight:800;color:#8b2fc9;background:#f3f0ff;padding:2px 8px;border-radius:20px;white-space:nowrap;margin-top:2px">'+n.time+'</span><div><div style="font-size:13px;font-weight:700;color:#18181b">'+n.title+'</div><div style="font-size:12px;color:#a1a1aa;margin-top:1px">'+n.msg+'</div></div></div>').join('');
+}
+function showPage(n){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.nbtn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('page-'+n).classList.add('active');
+  document.getElementById('nav-'+n).classList.add('active');
+  if(n==='stats')renderStats();
+  if(n==='settings')renderNotifSch();
+  if(n==='pet')renderPetPage();
+}
+function saveTopic(){const v=document.getElementById('topic-input').value.trim();if(v){localStorage.setItem('ntfy_topic',v);toast('✅ ntfy 主题已保存');}}
+function resetToday(){if(confirm('重置今日打卡记录？')){localStorage.removeItem('day_'+dk());renderTasks();updateRing();toast('已重置');}}
+function clearAll(){if(confirm('清除所有历史数据？此操作无法撤销。')){Object.keys(localStorage).forEach(k=>{if(k.startsWith('day_')||k==='history')localStorage.removeItem(k);});renderTasks();updateRing();updateXPBar();toast('已清除所有数据');}}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2000);}
+
+
+
+// 30 verified nature landscape photos — direct Unsplash CDN IDs
+const SCENE_PHOTOS = [
+  {name:'樱花晨曦', url:'https://images.unsplash.com/photo-1522383225653-ed111181a951?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'薰衣草田', url:'https://images.unsplash.com/photo-1499002238440-d264edd596ec?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'金色山脉', url:'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'碧蓝海洋', url:'https://images.unsplash.com/photo-1505118380757-91f5f5632de0?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'雪山圣境', url:'https://images.unsplash.com/photo-1491555103944-7c647fd857e6?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'枫叶秋林', url:'https://images.unsplash.com/photo-1474552226518-e5d3e10ed8b5?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'云海仙山', url:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'沙漠黄昏', url:'https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'星河银汉', url:'https://images.unsplash.com/photo-1519681393784-d120267933ba?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'热带瀑布', url:'https://images.unsplash.com/photo-1515709960810-8a8809d35ef5?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'湖心倒影', url:'https://images.unsplash.com/photo-1439853949212-36589f8f7658?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'绿野仙踪', url:'https://images.unsplash.com/photo-1500382017468-9049fed747ef?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'热带海湾', url:'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'郁金香园', url:'https://images.unsplash.com/photo-1457530378978-8bac673b8062?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'翡翠湖泊', url:'https://images.unsplash.com/photo-1458668383970-8ddd3927deed?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'云顶日出', url:'https://images.unsplash.com/photo-1495344517372-a70c1f9fca24?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'原始雨林', url:'https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'金色麦浪', url:'https://images.unsplash.com/photo-1473116763249-2faaef81ccda?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'雪峰晨光', url:'https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'花海盛放', url:'https://images.unsplash.com/photo-1490750967868-88df5691cc34?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'苔原霞光', url:'https://images.unsplash.com/photo-1470770841072-f978cf4d019e?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'夜樱如梦', url:'https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'星空营地', url:'https://images.unsplash.com/photo-1504280390367-361c6d9f38f4?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'金色落日', url:'https://images.unsplash.com/photo-1500534314209-a25ddb2bd429?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'晨雾山谷', url:'https://images.unsplash.com/photo-1426604966848-d7adac402bff?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'海岸礁石', url:'https://images.unsplash.com/photo-1505142468610-359e7d316be0?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'蔚蓝海滩', url:'https://images.unsplash.com/photo-1559494007-9f5847c49d94?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'极光之夜', url:'https://images.unsplash.com/photo-1531366936337-7c912a4589a7?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'秋日暖阳', url:'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1600&h=560&fit=crop&q=85&auto=format'},
+  {name:'玫瑰花园', url:'https://images.unsplash.com/photo-1490750967868-88df5691cc34?w=1600&h=560&fit=crop&q=85&auto=format&sat=20'},
+];
+
+function renderHeroScene() {
+  const now = new Date();
+  const seed = now.getDate() + now.getMonth() * 31 + 14;
+  const scene = SCENE_PHOTOS[seed % 30];
+  const el = document.getElementById('hero-scene');
+  if (!el) return;
+
+  // Set photo background with elegant overlay
+  el.style.cssText = 'position:absolute;inset:0;z-index:0;overflow:hidden;opacity:0;transition:opacity 1.2s ease';
+  el.innerHTML = `
+    <div id="hero-photo-bg" style="
+      position:absolute;inset:0;
+      background:url('${scene.url}') center/cover no-repeat;
+      transform:scale(1.04);
+      animation:heroKenBurns 20s ease-in-out infinite alternate;
+    "></div>
+    <div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.18) 0%,rgba(0,0,0,.08) 40%,rgba(0,0,0,.45) 100%)"></div>
+    <div style="position:absolute;bottom:14px;right:20px;font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.55);font-weight:500;text-shadow:0 1px 4px rgba(0,0,0,.6)">${scene.name}</div>
+  `;
+
+  // Fade in after image loads
+  const img = new Image();
+  img.onload = () => { el.style.opacity = '1'; };
+  img.onerror = () => {
+    // Fallback: use picsum with seed
+    el.querySelector('#hero-photo-bg').style.background = `url('https://picsum.photos/seed/wellness${seed}/1600/560') center/cover`;
+    el.style.opacity = '1';
+  };
+  img.src = scene.url;
+}
+
+
+renderHeader();renderDailyRec();renderTasks();updateRing();updateXPBar();renderTip();renderTodayPetCard();renderHeroScene();
+setInterval(renderHeader,60000);
+</script>
+</body>
+</html>
