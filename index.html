@@ -6,13 +6,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FIT OS">
-<meta name="theme-color" content="#05070b">
+<meta name="theme-color" content="#141c2b">
 <title>FIT·OS — 减脂作战系统</title>
 <style>
 :root{
-  --bg:#05070b; --bg2:#0a0f17; --surface:#0e1521; --surface2:#121b29;
-  --border:#1b2738; --line:#22324a;
-  --text:#e8f0f8; --muted:#8294aa; --dim:#4a5a70;
+  --bg:#141c2b; --bg2:#1a2436; --surface:rgba(31,43,62,.74); --surface2:rgba(38,52,74,.82);
+  --border:#314056; --line:#3a4b63;
+  --text:#eef4fb; --muted:#9fb0c6; --dim:#637691;
   --accent:#22d3ee; --accent2:#3b82f6; --accentd:#0e7490;
   --glow:rgba(34,211,238,.55); --ok:#34d399; --warn:#fbbf24; --danger:#f87171;
   --mono:ui-monospace,'SF Mono','JetBrains Mono',Menlo,Consolas,monospace;
@@ -20,13 +20,25 @@
 }
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{background:var(--bg)}
-body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:84px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+body{font-family:var(--sans);background:transparent;color:var(--text);min-height:100vh;padding-bottom:84px;overflow-x:hidden;-webkit-font-smoothing:antialiased}
 .mono{font-family:var(--mono)}
+
+/* ===== 全屏科技背景 ===== */
+#net{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+.bg-grid-full{position:fixed;inset:0;z-index:0;pointer-events:none;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:48px 48px;opacity:.07;animation:gridDrift 32s linear infinite}
+.bg-orb{position:fixed;border-radius:50%;filter:blur(90px);z-index:0;pointer-events:none;opacity:.3}
+.bg-orb.a{width:360px;height:360px;background:#0e7490;top:-110px;left:-90px;animation:floatA 20s ease-in-out infinite}
+.bg-orb.b{width:320px;height:320px;background:#1e3a8a;bottom:-130px;right:-70px;animation:floatB 26s ease-in-out infinite}
+.bg-orb.c{width:260px;height:260px;background:#155e75;top:46%;left:62%;animation:floatA 30s ease-in-out infinite}
+@keyframes floatA{50%{transform:translate(46px,34px) scale(1.1)}}
+@keyframes floatB{50%{transform:translate(-46px,-30px) scale(1.08)}}
+.vignette{position:fixed;inset:0;z-index:0;pointer-events:none;background:radial-gradient(120% 90% at 50% 30%,transparent 55%,rgba(8,12,20,.55) 100%)}
+.card,.icard,.plan-card,.scard,.stat-tile,.metric,.tipbox{backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
 .wrap{max-width:880px;margin:0 auto;padding:0 16px}
 @media(min-width:768px){.wrap{padding:0 24px}}
 
 /* ===== HUD HERO ===== */
-.hud{position:relative;overflow:hidden;background:radial-gradient(120% 120% at 50% -20%,#0c1828 0%,#05070b 60%);border-bottom:1px solid var(--line)}
+.hud{position:relative;overflow:hidden;background:radial-gradient(120% 120% at 50% -20%,rgba(36,58,92,.82) 0%,rgba(20,28,43,.55) 62%);border-bottom:1px solid var(--line)}
 .hud-grid{position:absolute;inset:0;background-image:linear-gradient(var(--line) 1px,transparent 1px),linear-gradient(90deg,var(--line) 1px,transparent 1px);background-size:38px 38px;opacity:.18;mask-image:radial-gradient(120% 90% at 50% 0%,#000 30%,transparent 80%);-webkit-mask-image:radial-gradient(120% 90% at 50% 0%,#000 30%,transparent 80%);animation:gridDrift 24s linear infinite}
 @keyframes gridDrift{to{background-position:38px 38px,38px 38px}}
 .hud-glow{position:absolute;border-radius:50%;filter:blur(60px);pointer-events:none}
@@ -34,6 +46,9 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .g2{width:180px;height:180px;background:rgba(59,130,246,.18);bottom:-80px;right:-40px}
 .scan{position:absolute;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,rgba(34,211,238,.5),transparent);top:0;animation:scan 6s ease-in-out infinite}
 @keyframes scan{0%{top:0;opacity:0}10%{opacity:1}90%{opacity:1}100%{top:100%;opacity:0}}
+.pulse{position:absolute;left:0;right:0;bottom:6px;width:100%;height:46px;z-index:1;opacity:.4;pointer-events:none}
+.pulse polyline{fill:none;stroke:var(--accent);stroke-width:1.6;filter:drop-shadow(0 0 5px var(--glow));stroke-dasharray:1400;stroke-dashoffset:1400;animation:ekg 4.5s linear infinite}
+@keyframes ekg{0%{stroke-dashoffset:1400}60%{stroke-dashoffset:0}100%{stroke-dashoffset:-1400}}
 .hud-inner{position:relative;z-index:2;padding:46px 0 30px}
 .hud-topline{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
 .sys-tag{font-family:var(--mono);font-size:10.5px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;display:flex;align-items:center;gap:7px}
@@ -76,17 +91,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .tg-head{font-family:var(--mono);font-size:10px;letter-spacing:2px;color:var(--accent);text-transform:uppercase;padding:14px 2px 8px;display:flex;align-items:center;gap:8px}
 .card{background:var(--surface);border:1px solid var(--border);border-radius:14px;overflow:hidden}
 
-.task{display:flex;align-items:center;gap:13px;padding:14px 15px;cursor:pointer;position:relative;transition:background .15s}
+.task{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;position:relative;transition:background .15s}
 .task:not(:last-child){border-bottom:1px solid var(--border)}
-.task:active{background:var(--surface2)}
-.t-time{font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.2);padding:3px 7px;border-radius:6px;flex-shrink:0;letter-spacing:.5px}
+.task:active,.task:hover{background:var(--surface2)}
+.t-ico{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:19px;flex-shrink:0;transition:.25s}
+.task.done .t-ico{filter:grayscale(.6);opacity:.6}
+.t-meta{display:flex;align-items:center;gap:7px;margin-top:6px}
+.t-time{font-family:var(--mono);font-size:10.5px;font-weight:600;color:var(--accent);background:rgba(34,211,238,.08);border:1px solid rgba(34,211,238,.2);padding:2px 7px;border-radius:6px;flex-shrink:0;letter-spacing:.5px}
 .t-mid{flex:1;min-width:0}
 .t-name{font-size:14.5px;font-weight:600;color:var(--text);transition:.2s;line-height:1.3}
 .task.done .t-name{color:var(--dim);text-decoration:line-through}
-.t-tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:5px;border:1px solid var(--line);padding:1px 6px;border-radius:5px}
+.t-tag{display:inline-block;font-family:var(--mono);font-size:9px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;border:1px solid var(--line);padding:1px 6px;border-radius:5px}
 .t-chk{width:26px;height:26px;border-radius:7px;border:1.5px solid var(--line);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.25s cubic-bezier(.4,1.4,.5,1);background:var(--bg2)}
 .t-chk svg{width:14px;height:14px;stroke:var(--bg);stroke-width:3.5;fill:none;opacity:0;transition:.2s}
-.task.done .t-chk{background:var(--accent);border-color:var(--accent);box-shadow:0 0 12px var(--glow)}
+.task.done .t-chk{background:var(--cc,var(--accent));border-color:var(--cc,var(--accent));box-shadow:0 0 12px var(--cc,var(--glow))}
 .task.done .t-chk svg{opacity:1}
 .t-body{max-height:0;overflow:hidden;transition:max-height .35s ease;background:var(--bg2)}
 .task.open + .t-body{max-height:200px}
@@ -116,7 +134,7 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .tipbox .tb{font-size:13.5px;color:var(--text);line-height:1.65}
 
 /* page hero (subpages) */
-.phero{position:relative;overflow:hidden;background:radial-gradient(120% 120% at 50% -30%,#0c1828,#05070b 70%);border-bottom:1px solid var(--line);padding:44px 0 22px}
+.phero{position:relative;overflow:hidden;background:radial-gradient(120% 120% at 50% -30%,rgba(36,58,92,.8),rgba(20,28,43,.5) 72%);border-bottom:1px solid var(--line);padding:44px 0 22px}
 .phero .hud-grid{opacity:.12}
 .phero h1{position:relative;z-index:2;font-size:21px;font-weight:800;letter-spacing:-.3px}
 .phero .sub{position:relative;z-index:2;font-family:var(--mono);font-size:11px;color:var(--muted);letter-spacing:1px;margin-top:6px;text-transform:uppercase}
@@ -161,20 +179,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 .nmsg{font-size:11.5px;color:var(--muted);margin-top:2px}
 
 /* nav */
-.nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(8,12,18,.85);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
+.nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(20,28,43,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
 .nav-in{max-width:880px;margin:0 auto;display:flex;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
 .nbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:7px 4px;background:none;border:none;color:var(--dim);font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase;cursor:pointer;border-radius:10px;transition:.2s}
 .nbtn svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.8}
 .nbtn.active{color:var(--accent)}
 .nbtn.active svg{filter:drop-shadow(0 0 6px var(--glow))}
 
-.page{display:none;animation:fade .3s ease}
+.page{display:none;animation:fade .3s ease;position:relative;z-index:1}
 .page.active{display:block}
 @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
 
 .toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface2);border:1px solid var(--accent);color:var(--text);font-family:var(--mono);font-size:12px;padding:11px 18px;border-radius:10px;opacity:0;pointer-events:none;transition:.3s;z-index:100;box-shadow:0 8px 30px rgba(0,0,0,.5)}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-.lvflash{position:fixed;inset:0;z-index:200;background:rgba(5,7,11,.92);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px}
+.lvflash{position:fixed;inset:0;z-index:200;background:rgba(20,28,43,.92);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;flex-direction:column;gap:10px}
 .lvflash.show{display:flex}
 .lvflash .le{font-size:64px}
 .lvflash .ll{font-family:var(--mono);font-size:13px;letter-spacing:3px;color:var(--accent);text-transform:uppercase}
@@ -182,11 +200,16 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 </style>
 </head>
 <body>
+<canvas id="net"></canvas>
+<div class="bg-grid-full"></div>
+<div class="bg-orb a"></div><div class="bg-orb b"></div><div class="bg-orb c"></div>
+<div class="vignette"></div>
 
 <!-- ===== TODAY ===== -->
 <div id="page-today" class="page active">
   <div class="hud">
     <div class="hud-grid"></div><div class="hud-glow g1"></div><div class="hud-glow g2"></div><div class="scan"></div>
+    <svg class="pulse" viewBox="0 0 1200 80" preserveAspectRatio="none"><polyline points="0,40 210,40 232,40 246,14 262,66 278,40 520,40 700,40 724,40 740,12 756,68 772,40 980,40 1200,40"/></svg>
     <div class="wrap hud-inner">
       <div class="hud-topline">
         <div class="sys-tag">FIT·OS 减脂作战系统</div>
@@ -312,19 +335,20 @@ body{font-family:var(--sans);background:var(--bg);color:var(--text);min-height:1
 
 <script>
 const TASKS=[
- {id:'t01',time:'07:00',sec:'晨间 / MORNING',tag:'称重',title:'晨起称重',desc:'空腹、上厕所后、不穿衣，固定条件称重并记录。看一周趋势，不要被单日水盐波动（±1-2斤很正常）影响心态。'},
- {id:'t02',time:'07:30',sec:'晨间 / MORNING',tag:'营养',title:'高蛋白早餐',desc:'先吃蛋白质：2个鸡蛋 / 无糖希腊酸奶 / 豆制品。蛋白质扛饿、稳血糖，压住上午的零食冲动，比不吃早餐更不易暴食。'},
- {id:'t03',time:'09:30',sec:'日间 / DAYTIME',tag:'补水',title:'补水 500ml',desc:'接一大杯水喝掉。很多「饿」其实是渴。喝够水代谢更顺，也能减少不必要的进食。'},
- {id:'t04',time:'10:30',sec:'日间 / DAYTIME',tag:'活动',title:'久坐起身',desc:'起来走 2 分钟，做几个深蹲或拉伸。NEAT（日常活动消耗）是减脂里被低估的一块，零散动起来积少成多。'},
- {id:'t05',time:'12:00',sec:'日间 / DAYTIME',tag:'营养',title:'午餐 · 盘子法则',desc:'一半蔬菜、四分之一蛋白质、四分之一主食。先吃菜和肉，最后吃主食。同样的食材换个顺序，血糖更稳、更扛饿。'},
- {id:'t06',time:'13:00',sec:'日间 / DAYTIME',tag:'活动',title:'饭后步行',desc:'吃完别马上坐下。走 10-15 分钟，帮助餐后血糖回落，下午不犯困，顺手又消耗一点。'},
- {id:'t07',time:'15:00',sec:'日间 / DAYTIME',tag:'控制',title:'下午零食拦截',desc:'嘴馋先喝水等 10 分钟，多半是无聊不是饿。真饿就吃一小把坚果或一个水果，别碰饼干奶茶——一杯奶茶≈半小时跑步。'},
- {id:'t08',time:'16:30',sec:'日间 / DAYTIME',tag:'补水',title:'再补一次水',desc:'下午再喝 400-500ml。保持补水，避免把口渴误当饥饿，也让晚饭前不至于太饿而点多。'},
- {id:'t09',time:'17:30',sec:'训练 / TRAINING',tag:'训练',title:'今日训练',desc:'力量 30 分钟，或有氧/快走 8000 步。力量保肌肉、垫高基础代谢；有氧多烧热量。哪怕只做 15 分钟，也远胜于零。'},
- {id:'t10',time:'19:00',sec:'晚间 / EVENING',tag:'营养',title:'晚餐七分饱',desc:'清淡、七分饱，睡前 3 小时吃完。蛋白质 + 大量蔬菜 + 少量主食。晚上少囤、睡得稳，第二天称重更友好。'},
- {id:'t11',time:'21:00',sec:'晚间 / EVENING',tag:'复盘',title:'今日复盘',desc:'花 1 分钟记一下：今天吃得如何、动了没、水喝够没。记录本身就是减脂利器——看得见才控得住。允许不完美。'},
- {id:'t12',time:'22:30',sec:'睡眠 / SLEEP',tag:'恢复',title:'早点睡',desc:'睡眠不足会升高饥饿素、降低代谢，第二天格外想吃高糖高油。放下手机，睡够 7 小时，是最省力的减脂动作。'},
+ {id:'t01',time:'07:00',sec:'晨间 / MORNING',icon:'⚖️',tag:'称重',title:'晨起称重',desc:'空腹、上厕所后、不穿衣，固定条件称重并记录。看一周趋势，不要被单日水盐波动（±1-2斤很正常）影响心态。'},
+ {id:'t02',time:'07:30',sec:'晨间 / MORNING',icon:'🍳',tag:'营养',title:'高蛋白早餐',desc:'先吃蛋白质：2个鸡蛋 / 无糖希腊酸奶 / 豆制品。蛋白质扛饿、稳血糖，压住上午的零食冲动，比不吃早餐更不易暴食。'},
+ {id:'t03',time:'09:30',sec:'日间 / DAYTIME',icon:'💧',tag:'补水',title:'补水 500ml',desc:'接一大杯水喝掉。很多「饿」其实是渴。喝够水代谢更顺，也能减少不必要的进食。'},
+ {id:'t04',time:'10:30',sec:'日间 / DAYTIME',icon:'🧍',tag:'活动',title:'久坐起身',desc:'起来走 2 分钟，做几个深蹲或拉伸。NEAT（日常活动消耗）是减脂里被低估的一块，零散动起来积少成多。'},
+ {id:'t05',time:'12:00',sec:'日间 / DAYTIME',icon:'🥗',tag:'营养',title:'午餐 · 盘子法则',desc:'一半蔬菜、四分之一蛋白质、四分之一主食。先吃菜和肉，最后吃主食。同样的食材换个顺序，血糖更稳、更扛饿。'},
+ {id:'t06',time:'13:00',sec:'日间 / DAYTIME',icon:'👟',tag:'活动',title:'饭后步行',desc:'吃完别马上坐下。走 10-15 分钟，帮助餐后血糖回落，下午不犯困，顺手又消耗一点。'},
+ {id:'t07',time:'15:00',sec:'日间 / DAYTIME',icon:'🚫',tag:'控制',title:'下午零食拦截',desc:'嘴馋先喝水等 10 分钟，多半是无聊不是饿。真饿就吃一小把坚果或一个水果，别碰饼干奶茶——一杯奶茶≈半小时跑步。'},
+ {id:'t08',time:'16:30',sec:'日间 / DAYTIME',icon:'💧',tag:'补水',title:'再补一次水',desc:'下午再喝 400-500ml。保持补水，避免把口渴误当饥饿，也让晚饭前不至于太饿而点多。'},
+ {id:'t09',time:'17:30',sec:'训练 / TRAINING',icon:'🏋️',tag:'训练',title:'今日训练',desc:'力量 30 分钟，或有氧/快走 8000 步。力量保肌肉、垫高基础代谢；有氧多烧热量。哪怕只做 15 分钟，也远胜于零。'},
+ {id:'t10',time:'19:00',sec:'晚间 / EVENING',icon:'🍽️',tag:'营养',title:'晚餐七分饱',desc:'清淡、七分饱，睡前 3 小时吃完。蛋白质 + 大量蔬菜 + 少量主食。晚上少囤、睡得稳，第二天称重更友好。'},
+ {id:'t11',time:'21:00',sec:'晚间 / EVENING',icon:'📊',tag:'复盘',title:'今日复盘',desc:'花 1 分钟记一下：今天吃得如何、动了没、水喝够没。记录本身就是减脂利器——看得见才控得住。允许不完美。'},
+ {id:'t12',time:'22:30',sec:'睡眠 / SLEEP',icon:'🌙',tag:'恢复',title:'早点睡',desc:'睡眠不足会升高饥饿素、降低代谢，第二天格外想吃高糖高油。放下手机，睡够 7 小时，是最省力的减脂动作。'},
 ];
+const SEC={'晨间 / MORNING':'#fbbf24','日间 / DAYTIME':'#22d3ee','训练 / TRAINING':'#fb7185','晚间 / EVENING':'#a78bfa','睡眠 / SLEEP':'#60a5fa'};
 const NOTIFS=TASKS.map(t=>({time:t.time,title:t.title,msg:t.desc.slice(0,28)+'…'}));
 const TIPS=[
  {t:'能量缺口才是核心',c:'减脂本质是吃进去的 < 消耗的。每天比维持热量少 300-500 大卡，稳掉秤、不掉肌、不反弹。无需极端节食。'},
@@ -385,11 +409,12 @@ function renderTasks(){
  TASKS.forEach(t=>{(groups[t.sec]=groups[t.sec]||[]).push(t);});
  let html='';
  Object.keys(groups).forEach(sec=>{
-  html+='<div class="tgroup"><div class="tg-head">▸ '+sec+'</div><div class="card">';
+  const c=SEC[sec]||'#22d3ee';
+  html+='<div class="tgroup"><div class="tg-head" style="color:'+c+'">▸ '+sec+'</div><div class="card" style="border-left:2px solid '+c+'">';
   groups[sec].forEach(t=>{const d=done.includes(t.id);
-   html+='<div class="task'+(d?' done':'')+'" onclick="toggleOpen(this)" data-id="'+t.id+'">'
-    +'<span class="t-time mono">'+t.time+'</span>'
-    +'<div class="t-mid"><div class="t-name">'+t.title+'</div><span class="t-tag">'+t.tag+'</span></div>'
+   html+='<div class="task'+(d?' done':'')+'" style="--cc:'+c+'" onclick="toggleOpen(this)" data-id="'+t.id+'">'
+    +'<div class="t-ico" style="background:'+c+'1a;border:1px solid '+c+'40;box-shadow:0 0 14px '+c+'22">'+t.icon+'</div>'
+    +'<div class="t-mid"><div class="t-name">'+t.title+'</div><div class="t-meta"><span class="t-time mono" style="color:'+c+';background:'+c+'14;border-color:'+c+'40">'+t.time+'</span><span class="t-tag">'+t.tag+'</span></div></div>'
     +'<span class="t-caret">▾</span>'
     +'<div class="t-chk" onclick="event.stopPropagation();toggleDone(this)"><svg viewBox="0 0 24 24"><polyline points="4 12 10 18 20 6"/></svg></div>'
     +'</div><div class="t-body"><div class="t-body-in">'+t.desc+'</div></div>';
@@ -483,6 +508,27 @@ function toast(m){const t=document.getElementById('toast');t.textContent=m;t.cla
 
 syncHistory();renderHeader();renderTasks();renderPlanToday();renderTip();updateRing();updateXP();
 setInterval(renderHeader,60000);
+
+// ===== 全屏粒子星座网络 =====
+(function(){
+ const cv=document.getElementById('net');if(!cv||!cv.getContext)return;
+ const ctx=cv.getContext('2d');let w,h,dpr,pts;
+ function resize(){dpr=Math.min(window.devicePixelRatio||1,2);w=cv.width=innerWidth*dpr;h=cv.height=innerHeight*dpr;cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';}
+ function init(){const n=Math.min(110,Math.floor(innerWidth*innerHeight/12000));pts=[];for(let i=0;i<n;i++)pts.push({x:Math.random()*w,y:Math.random()*h,vx:(Math.random()-.5)*.28*dpr,vy:(Math.random()-.5)*.28*dpr});}
+ function tick(){
+  ctx.clearRect(0,0,w,h);
+  const D=140*dpr;
+  for(const p of pts){p.x+=p.vx;p.y+=p.vy;if(p.x<0||p.x>w)p.vx*=-1;if(p.y<0||p.y>h)p.vy*=-1;}
+  for(let i=0;i<pts.length;i++)for(let j=i+1;j<pts.length;j++){
+   const a=pts[i],b=pts[j],dx=a.x-b.x,dy=a.y-b.y,d=Math.hypot(dx,dy);
+   if(d<D){const o=(1-d/D)*.45;ctx.strokeStyle='rgba(34,211,238,'+o+')';ctx.lineWidth=1*dpr;ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();}
+  }
+  for(const p of pts){ctx.fillStyle='rgba(56,189,248,.85)';ctx.beginPath();ctx.arc(p.x,p.y,1.6*dpr,0,7);ctx.fill();}
+  requestAnimationFrame(tick);
+ }
+ resize();init();tick();
+ let t;addEventListener('resize',()=>{clearTimeout(t);t=setTimeout(()=>{resize();init();},200);});
+})();
 </script>
 </body>
 </html>
