@@ -208,6 +208,23 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
 .ntitle{font-size:13px;font-weight:600;color:var(--text)}
 .nmsg{font-size:11.5px;color:var(--muted);margin-top:2px}
 
+/* 体征监测 */
+.bw-head{display:flex;justify-content:space-between;align-items:flex-end;margin:8px 0 14px;padding:0 2px}
+.bw-cur{font-size:48px;font-weight:800;line-height:1;color:var(--text);text-shadow:0 0 18px rgba(34,211,238,.25)}
+.bw-unit{font-family:var(--mono);font-size:10px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:7px}
+.bw-delta{font-family:var(--mono);font-size:14px;font-weight:700;padding:6px 11px;border-radius:9px;border:1px solid var(--line);color:var(--muted)}
+.bw-delta.down{color:var(--ok);border-color:rgba(52,211,153,.4);background:rgba(52,211,153,.08)}
+.bw-delta.up{color:#fb7185;border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.08)}
+#wchart{width:100%;display:block}
+.wlegend{display:flex;gap:18px;justify-content:center;margin-top:10px;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.wlegend i{display:inline-block;width:11px;height:3px;border-radius:2px;margin-right:5px;vertical-align:middle}
+.gauge-trk{height:11px;background:var(--bg2);border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0 7px}
+.gauge-fill{height:100%;background:linear-gradient(90deg,var(--accent2),var(--ok));border-radius:8px;box-shadow:0 0 10px var(--glow);transition:width .9s cubic-bezier(.4,1.4,.5,1)}
+.gauge-lbl{display:flex;justify-content:space-between;font-family:var(--mono);font-size:10px;color:var(--muted)}
+.inp-row{display:flex;gap:8px;margin-top:8px}
+.inp-row .sinput{flex:1}
+.inp-row .sbtn{width:auto;margin-top:0;padding:0 18px;white-space:nowrap}
+
 /* nav */
 .nav{position:fixed;bottom:0;left:0;right:0;z-index:50;background:rgba(20,28,43,.88);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-top:1px solid var(--line)}
 .nav-in{max-width:880px;margin:0 auto;display:flex;padding:8px 10px calc(8px + env(safe-area-inset-bottom))}
@@ -333,6 +350,41 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
   </div>
 </div>
 
+<!-- ===== BODY 体征 ===== -->
+<div id="page-body" class="page">
+  <div class="phero"><div class="hud-grid"></div><div class="wrap"><h1>体征监测</h1><div class="sub">Body Telemetry · 趋势 / 预测</div></div></div>
+  <div class="wrap" style="padding-top:14px">
+    <div class="bw-head">
+      <div><div class="bw-cur mono" id="bw-cur">--</div><div class="bw-unit">KG · 当前体重</div></div>
+      <div class="bw-delta mono" id="bw-delta">—</div>
+    </div>
+    <div class="card" style="padding:14px 14px 12px"><canvas id="wchart"></canvas>
+      <div class="wlegend"><span><i style="background:#22d3ee"></i>体重</span><span><i style="background:#fbbf24"></i>7日均线</span><span><i style="background:#34d399"></i>目标</span></div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-tile"><div class="stat-big mono" id="b-bmi">--</div><div class="stat-k" id="b-bmilbl">BMI（填身高）</div></div>
+      <div class="stat-tile"><div class="stat-big mono" id="b-chg">--</div><div class="stat-k">累计变化 / KG</div></div>
+      <div class="stat-tile"><div class="stat-big mono" id="b-rate">--</div><div class="stat-k">周均速率 / KG·W</div></div>
+      <div class="stat-tile"><div class="stat-big mono" id="b-eta" style="font-size:22px">--</div><div class="stat-k">预计达标 / ETA</div></div>
+    </div>
+    <div class="card" style="padding:15px;margin-top:10px">
+      <h4 style="font-family:var(--mono);font-size:10px;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;margin-bottom:4px">目标进度 / GOAL PROGRESS</h4>
+      <div class="gauge-trk"><div class="gauge-fill" id="b-gauge" style="width:0%"></div></div>
+      <div class="gauge-lbl"><span id="b-gstart">起点 --</span><span id="b-gnow" style="color:var(--accent)">--</span><span id="b-ggoal">目标 --</span></div>
+    </div>
+    <div class="scard" style="margin-top:10px">
+      <h3>＋ 记录今日体重</h3>
+      <div class="inp-row"><input class="sinput" id="in-weight" type="number" inputmode="decimal" step="0.1" placeholder="今日体重 kg"><button class="sbtn" onclick="logWeight()">记录</button></div>
+    </div>
+    <div class="scard">
+      <h3>⚙ 目标 / 身高</h3>
+      <div class="inp-row"><input class="sinput" id="in-goal" type="number" inputmode="decimal" step="0.1" placeholder="目标体重 kg"><button class="sbtn" onclick="saveGoal()">保存</button></div>
+      <div class="inp-row"><input class="sinput" id="in-height" type="number" inputmode="decimal" step="0.5" placeholder="身高 cm（用于 BMI）"><button class="sbtn" onclick="saveHeight()">保存</button></div>
+    </div>
+    <div style="height:14px"></div>
+  </div>
+</div>
+
 <!-- ===== SETTINGS ===== -->
 <div id="page-settings" class="page">
   <div class="phero"><div class="hud-grid"></div><div class="wrap"><h1>系统设置</h1><div class="sub">System Config</div></div></div>
@@ -367,6 +419,7 @@ body{font-family:var(--sans);background:transparent;color:var(--text);min-height
   <button class="nbtn active" id="nav-today" onclick="showPage('today')"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>今日</button>
   <button class="nbtn" id="nav-plan" onclick="showPage('plan')"><svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M3 9h18M8 2v4M16 2v4"/></svg>计划</button>
   <button class="nbtn" id="nav-data" onclick="showPage('data')"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>数据</button>
+  <button class="nbtn" id="nav-body" onclick="showPage('body')"><svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 13 2-7h6"/></svg>体征</button>
   <button class="nbtn" id="nav-settings" onclick="showPage('settings')"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1l2-1.5-2-3.5-2.4 1a7 7 0 0 0-1.7-1l-.3-2.5h-4l-.3 2.5a7 7 0 0 0-1.7 1l-2.4-1-2 3.5 2 1.5a7 7 0 0 0 0 2l-2 1.5 2 3.5 2.4-1a7 7 0 0 0 1.7 1l.3 2.5h4l.3-2.5a7 7 0 0 0 1.7-1l2.4 1 2-3.5-2-1.5a7 7 0 0 0 .1-1Z"/></svg>设置</button>
 </div></div>
 
@@ -536,6 +589,52 @@ function renderSched(){
  document.getElementById('topic').value=localStorage.getItem('ntfy_topic')||'';
  document.getElementById('sched').innerHTML=NOTIFS.map(n=>'<div class="nrow"><span class="ntime mono">'+n.time+'</span><div><div class="ntitle">'+n.title+'</div></div></div>').join('');
 }
+// ===== 体征监测 =====
+function wStore(){return JSON.parse(localStorage.getItem('weights')||'{}');}
+function wArr(){const o=wStore();return Object.keys(o).sort().map(d=>({d,kg:+o[d]}));}
+function logWeight(){const el=document.getElementById('in-weight'),v=parseFloat(el.value);if(!v||v<20||v>400){toast('请输入有效体重(20-400kg)');return;}const o=wStore();o[dk()]=v;localStorage.setItem('weights',JSON.stringify(o));el.value='';renderBody();toast('✓ 已记录 '+v+' kg');if(window.__burst)window.__burst(innerWidth/2,150,20,['#22d3ee','#34d399']);}
+function saveGoal(){const v=parseFloat(document.getElementById('in-goal').value);if(v){localStorage.setItem('goalW',v);renderBody();toast('✓ 目标已保存');}}
+function saveHeight(){const v=parseFloat(document.getElementById('in-height').value);if(v){localStorage.setItem('heightCm',v);renderBody();toast('✓ 身高已保存');}}
+function movAvg(arr,k){return arr.map((p,i)=>{const s=arr.slice(Math.max(0,i-k+1),i+1);return s.reduce((a,b)=>a+b.kg,0)/s.length;});}
+function renderBody(){
+ const a=wArr(),goal=parseFloat(localStorage.getItem('goalW'))||null,hcm=parseFloat(localStorage.getItem('heightCm'))||null;
+ const ig=document.getElementById('in-goal'),ih=document.getElementById('in-height');if(goal&&!ig.value)ig.value=goal;if(hcm&&!ih.value)ih.value=hcm;
+ const cur=a.length?a[a.length-1].kg:null;
+ document.getElementById('bw-cur').textContent=cur!=null?cur.toFixed(1):'--';
+ const de=document.getElementById('bw-delta');
+ if(a.length>=2){const prev=a[Math.max(0,a.length-8)].kg,d=cur-prev;de.textContent=(d>=0?'+':'')+d.toFixed(1)+' kg';de.className='bw-delta mono '+(d<=0?'down':'up');}else{de.textContent='—';de.className='bw-delta mono';}
+ const bmiEl=document.getElementById('b-bmi'),bl=document.getElementById('b-bmilbl');
+ if(cur&&hcm){const bmi=cur/Math.pow(hcm/100,2);bmiEl.textContent=bmi.toFixed(1);bl.textContent='BMI · '+(bmi<18.5?'偏瘦':bmi<24?'正常':bmi<28?'偏胖':'肥胖');}else{bmiEl.textContent='--';bl.textContent='BMI（填身高）';}
+ document.getElementById('b-chg').textContent=a.length>=2?((cur-a[0].kg>=0?'+':'')+(cur-a[0].kg).toFixed(1)):'--';
+ const seg=a.slice(-14);let slope=0;
+ if(seg.length>=2){const x0=new Date(seg[0].d).getTime(),xs=seg.map(p=>(new Date(p.d).getTime()-x0)/864e5),ys=seg.map(p=>p.kg),n=xs.length,sx=xs.reduce((q,w)=>q+w,0),sy=ys.reduce((q,w)=>q+w,0),sxx=xs.reduce((q,w)=>q+w*w,0),sxy=xs.reduce((q,w,i)=>q+w*ys[i],0),den=n*sxx-sx*sx;slope=den?(n*sxy-sx*sy)/den:0;}
+ document.getElementById('b-rate').textContent=seg.length>=2?((slope*7>=0?'+':'')+(slope*7).toFixed(2)):'--';
+ const eta=document.getElementById('b-eta');
+ if(goal&&cur&&seg.length>=3&&Math.abs(slope)>1e-4&&((goal<cur&&slope<0)||(goal>cur&&slope>0))){const days=Math.ceil((goal-cur)/slope);if(days>0&&days<3650){const d=new Date();d.setDate(d.getDate()+days);eta.textContent=(d.getMonth()+1)+'/'+d.getDate();}else eta.textContent='—';}else eta.textContent='—';
+ const gs=document.getElementById('b-gauge');
+ if(goal&&a.length){const start=a[0].kg,total=start-goal,pct=Math.max(0,Math.min(100,total!==0?(start-cur)/total*100:0));gs.style.width=pct+'%';document.getElementById('b-gstart').textContent='起点 '+start.toFixed(1);document.getElementById('b-gnow').textContent=pct.toFixed(0)+'%';document.getElementById('b-ggoal').textContent='目标 '+goal;}
+ else{gs.style.width='0%';document.getElementById('b-gstart').textContent='起点 --';document.getElementById('b-gnow').textContent='--';document.getElementById('b-ggoal').textContent='目标 '+(goal||'--');}
+ drawWChart(a,goal);
+}
+function drawWChart(a,goal){
+ const cv=document.getElementById('wchart');if(!cv||!cv.getContext)return;const ctx=cv.getContext('2d');
+ const cssW=(cv.parentElement.clientWidth||320)-28,cssH=180,dpr=Math.min(window.devicePixelRatio||1,2);
+ cv.width=cssW*dpr;cv.height=cssH*dpr;cv.style.height=cssH+'px';ctx.scale(dpr,dpr);ctx.clearRect(0,0,cssW,cssH);
+ if(a.length<1){ctx.fillStyle='#6b7d96';ctx.font='12px monospace';ctx.textAlign='center';ctx.fillText('记录体重后，这里显示趋势曲线',cssW/2,cssH/2);return;}
+ const kept=a.slice(-30),ys=kept.map(p=>p.kg);let mn=Math.min(...ys),mx=Math.max(...ys);if(goal){mn=Math.min(mn,goal);mx=Math.max(mx,goal);}const pad=(mx-mn)*0.15||1;mn-=pad;mx+=pad;
+ const L=36,R=8,T=12,B=18,W=cssW-L-R,H=cssH-T-B;
+ const X=i=>L+(kept.length<=1?W/2:W*i/(kept.length-1)),Y=v=>T+H-(v-mn)/(mx-mn)*H;
+ ctx.strokeStyle='rgba(120,150,180,.12)';ctx.fillStyle='#6b7d96';ctx.font='9px monospace';ctx.textAlign='right';ctx.lineWidth=1;
+ for(let g=0;g<=3;g++){const v=mn+(mx-mn)*g/3,y=Y(v);ctx.beginPath();ctx.moveTo(L,y);ctx.lineTo(L+W,y);ctx.stroke();ctx.fillText(v.toFixed(1),L-5,y+3);}
+ if(goal){const gy=Y(goal);ctx.strokeStyle='rgba(52,211,153,.75)';ctx.setLineDash([5,4]);ctx.beginPath();ctx.moveTo(L,gy);ctx.lineTo(L+W,gy);ctx.stroke();ctx.setLineDash([]);}
+ const ma=movAvg(kept,7);ctx.strokeStyle='rgba(251,191,36,.9)';ctx.lineWidth=2;ctx.beginPath();ma.forEach((v,i)=>{i?ctx.lineTo(X(i),Y(v)):ctx.moveTo(X(i),Y(v));});ctx.stroke();
+ const grad=ctx.createLinearGradient(0,T,0,T+H);grad.addColorStop(0,'rgba(34,211,238,.3)');grad.addColorStop(1,'rgba(34,211,238,0)');
+ ctx.beginPath();kept.forEach((p,i)=>{i?ctx.lineTo(X(i),Y(p.kg)):ctx.moveTo(X(i),Y(p.kg));});ctx.lineTo(X(kept.length-1),T+H);ctx.lineTo(X(0),T+H);ctx.closePath();ctx.fillStyle=grad;ctx.fill();
+ ctx.strokeStyle='#22d3ee';ctx.lineWidth=2.4;ctx.beginPath();kept.forEach((p,i)=>{i?ctx.lineTo(X(i),Y(p.kg)):ctx.moveTo(X(i),Y(p.kg));});ctx.stroke();
+ ctx.fillStyle='#22d3ee';kept.forEach((p,i)=>{ctx.beginPath();ctx.arc(X(i),Y(p.kg),2.3,0,7);ctx.fill();});
+ const lp=kept[kept.length-1];ctx.shadowBlur=10;ctx.shadowColor='#22d3ee';ctx.fillStyle='#eaffff';ctx.beginPath();ctx.arc(X(kept.length-1),Y(lp.kg),3.6,0,7);ctx.fill();ctx.shadowBlur=0;
+}
+
 function showPage(p){
  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
  document.querySelectorAll('.nbtn').forEach(x=>x.classList.remove('active'));
@@ -543,6 +642,7 @@ function showPage(p){
  document.getElementById('nav-'+p).classList.add('active');
  window.scrollTo(0,0);
  if(p==='data')renderData();
+ if(p==='body')renderBody();
  if(p==='settings')renderSched();
 }
 function saveTopic(){const v=document.getElementById('topic').value.trim();if(v){localStorage.setItem('ntfy_topic',v);toast('✓ ntfy 主题已保存');}}
